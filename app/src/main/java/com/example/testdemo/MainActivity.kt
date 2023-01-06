@@ -18,6 +18,13 @@ import com.google.mediapipe.solutions.hands.HandLandmark
 import com.google.mediapipe.solutions.hands.Hands
 import com.google.mediapipe.solutions.hands.HandsOptions
 import com.google.mediapipe.solutions.hands.HandsResult
+import com.example.testdemo.keyboard.Distance
+import com.example.testdemo.keyboard.FingerDetect
+import com.example.testdemo.keyboard.HandMark
+import com.example.testdemo.keyboard.HandMarks
+import com.example.testdemo.keyboard.KeyInformation
+import com.example.testdemo.keyboard.MoveAverage
+import com.example.testdemo.keyboard.OptimizedMarks
 
 /**
  * 摄像头展示界面
