@@ -18,12 +18,12 @@ public class OptimizedMarks {
         this.aveOptMarks.push(h0,false);
     }
 
-    public void pushfront(HandMark handMark){
+    public void pushback(HandMark handMark){
         this.originMarks.push(handMark,false);
         int listSize=originMarks.markList.size();
-        if(listSize>3){
-            HandMark h=MoveAverage.calc4Average(originMarks.markList.get(listSize),originMarks.markList.get(listSize-1),
-                    originMarks.markList.get(listSize-2),originMarks.markList.get(listSize-3));
+        if(listSize>4){
+            HandMark h=MoveAverage.calc4Average(originMarks.markList.get(listSize-1),originMarks.markList.get(listSize-2),
+                    originMarks.markList.get(listSize-3),originMarks.markList.get(listSize-4));
             this.aveOptMarks.push(h,false);
         }else{
             this.aveOptMarks.push(handMark,false);
@@ -41,7 +41,7 @@ public class OptimizedMarks {
     }
 
 
-    public HandMarks originMarks;
-    public HandMarks aveOptMarks;
-    public HandMarks multipOptMarks;
+    public HandMarks originMarks = new HandMarks();
+    public HandMarks aveOptMarks = new HandMarks();
+    public HandMarks multipOptMarks = new HandMarks();
 }

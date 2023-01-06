@@ -10,32 +10,27 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.testdemo.databinding.ActivityMainBinding
+import com.example.testdemo.keyboard.*
 import com.google.mediapipe.components.PermissionHelper
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
-import com.google.mediapipe.solutions.hands.HandLandmark
 import com.google.mediapipe.solutions.hands.Hands
 import com.google.mediapipe.solutions.hands.HandsOptions
 import com.google.mediapipe.solutions.hands.HandsResult
-import com.example.testdemo.keyboard.Distance
-import com.example.testdemo.keyboard.FingerDetect
-import com.example.testdemo.keyboard.HandMark
-import com.example.testdemo.keyboard.HandMarks
-import com.example.testdemo.keyboard.KeyInformation
-import com.example.testdemo.keyboard.MoveAverage
-import com.example.testdemo.keyboard.OptimizedMarks
 
 /**
  * 摄像头展示界面
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+
     // 实时相机演示UI和相机组件。
     private lateinit var cameraInput: CameraInput
     private var glSurfaceView: SolutionGlSurfaceView<HandsResult>? = null
     private var hands: Hands? = null
     private val TAG = "MainActivity"
+    private lateinit var keyboard:TestKeyBoard
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -67,15 +62,17 @@ class MainActivity : AppCompatActivity() {
 
             Log.v("多少", "${ResUIUtils.dip2px(100f)}")
         }*/
-
+        keyboard = TestKeyBoard()
+        keyboard.Init()
         //动态绘制键盘View
         binding.keyboardLayout.removeAllViewsInLayout()
-        for (j in 0..2) {
-            for (i in 0..6) {
+        for (i in 0..9){
+            val map = keyboard.testKeyMap[i]
+            map?.let { keyboard ->
                 val textView = TextView(this)
-                textView.x = 20f + (j * 320).toFloat()
-                textView.y = (i * 220).toFloat()
-                val params = FrameLayout.LayoutParams(300, 200)
+                textView.x = (keyboard.position.pixel_x).toFloat()
+                textView.y = (keyboard.position.pixel_y).toFloat()
+                val params = FrameLayout.LayoutParams(keyboard.keyShape.key_width.toInt(), keyboard.keyShape.key_height.toInt())
                 textView.layoutParams = params
                 textView.text = "$i"
                 textView.gravity = Gravity.CENTER
@@ -86,6 +83,12 @@ class MainActivity : AppCompatActivity() {
                 binding.keyboardLayout.addView(textView)
             }
         }
+
+        /*for (j in 0..2) {
+            for (i in 0..6) {
+
+            }
+        }*/
         binding.keyboardLayout.requestLayout()
     }
 
@@ -189,7 +192,8 @@ class MainActivity : AppCompatActivity() {
             glSurfaceView!!.height
         )
     }
-
+    val handMarks = HandMarks()
+    val optimizedMarks = OptimizedMarks()
     private fun logWristLandmark(result: HandsResult, showPixelValues: Boolean) {
         if (result.multiHandLandmarks().isEmpty()) {
             return
@@ -218,7 +222,39 @@ class MainActivity : AppCompatActivity() {
         }
         //multiHandLandmarks  像素坐标  multiHandWorldLandmarks  真实坐标
         //L.v(Gson().toJson(result.multiHandLandmarks()))
-        val wristWorldLandmark =
+        //获取真实坐标
+        val landmark = result.multiHandWorldLandmarks()[0].landmarkList
+        //获取像素坐标
+        val normalizedLandmark = result.multiHandLandmarks()[0].landmarkList
+
+        if(landmark.isEmpty()&&normalizedLandmark.isEmpty()){
+            return
+        }
+        L.v("長度---${landmark.size}----${normalizedLandmark.size}")
+        //坐标转换成handMark
+        val handMark = HandMark.lm2hm(landmark, normalizedLandmark)
+
+        //判断是否满足120帧
+        if (optimizedMarks.aveOptMarks.markList.size < 120) {
+            //存储帧数据
+            optimizedMarks.pushback(handMark)
+        } else {
+            //满足120帧  先删除第一针
+            optimizedMarks.popfront()
+            optimizedMarks.pushback(handMark)
+            val position = optimizedMarks.aveOptMarks.markList.last.jointPoint[8]
+            val intKeyId= FingerDetect.pushedKey(position)
+            val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
+            val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
+
+            L.v("$isFingerOnKey-----$isKeyPushed")
+            if(isFingerOnKey&&isKeyPushed){
+                L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
+            }
+        }
+
+
+        /*val wristWorldLandmark =
             result.multiHandWorldLandmarks()[0].landmarkList[HandLandmark.INDEX_FINGER_TIP]
 
         L.v(
@@ -226,7 +262,7 @@ class MainActivity : AppCompatActivity() {
                 "WorldLandmarks-------INDEX_FINGER_TIP:x=%f m, y=%f m, z=%f m",
                 wristWorldLandmark.x, wristWorldLandmark.y, wristWorldLandmark.z
             )
-        )
+        )*/
         /*Log.i(
             TAG, String.format(
                 "MediaPipe Hand wrist world coordinates (in meters with the origin at the hand's"
