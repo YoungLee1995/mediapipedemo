@@ -46,13 +46,15 @@ public class FingerDetect {
             }
         }
         for(int i=1;i<signList.length;i++){
-            if(signList[i]==true){
+            if(signList[i]){
                 totalSign++;
             }
         }
         if(totalSign/10>0.7){
             handMarks.historyMoveSign.pop();
             handMarks.historyMoveSign.push(true);
+        }
+        if(!handMarks.historyMoveSign.get(handMarks.historyMoveSign.size()-2)){
             return true;
         }
 
