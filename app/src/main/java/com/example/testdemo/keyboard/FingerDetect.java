@@ -52,9 +52,9 @@ public class FingerDetect {
         }
         if(totalSign/10>0.7){
             handMarks.historyMoveSign.pop();
-            handMarks.historyMoveSign.push(true);
+            handMarks.historyMoveSign.addLast(true);
         }
-        if(!handMarks.historyMoveSign.get(handMarks.historyMoveSign.size()-2)){
+        if(handMarks.historyMoveSign.getLast()&&!handMarks.historyMoveSign.get(handMarks.historyMoveSign.size()-2)){
             return true;
         }
 

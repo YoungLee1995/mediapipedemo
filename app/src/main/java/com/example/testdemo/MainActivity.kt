@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private var hands: Hands? = null
     private val TAG = "MainActivity"
     private lateinit var keyboard:TestKeyBoard
+    private val keyContent:StringBuffer = StringBuffer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
             Log.v("多少", "${ResUIUtils.dip2px(100f)}")
         }*/
+        keyContent.setLength(0)
         keyboard = TestKeyBoard()
         keyboard.Init()
         //动态绘制键盘View
@@ -90,6 +92,12 @@ class MainActivity : AppCompatActivity() {
             }
         }*/
         binding.keyboardLayout.requestLayout()
+
+
+        binding.btnOpen.setOnClickListener {
+            keyContent.setLength(0)
+            binding.keyboardContent.text = keyContent.toString()
+        }
     }
 
     /*override fun onResume() {
@@ -250,6 +258,15 @@ class MainActivity : AppCompatActivity() {
             L.v("$isFingerOnKey-----$isKeyPushed")
             if(isFingerOnKey&&isKeyPushed){
                 L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
+
+                if(keyContent.isEmpty()){
+                    keyContent.append(keyboard.testKeyMap[intKeyId]?.id)
+                }else{
+                    keyContent.append(",${keyboard.testKeyMap[intKeyId]?.id}")
+                }
+                binding.keyboardContent.post {
+                    binding.keyboardContent.text = keyContent.toString()
+                }
             }
         }
 

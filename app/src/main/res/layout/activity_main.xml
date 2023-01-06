@@ -37,4 +37,30 @@
         android:textColor="@color/black"
         android:textSize="24sp"
         android:layout_gravity="center"/>-->
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
+        <TextView
+                android:id="@+id/keyboard_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:background="@drawable/button_bg"/>
+
+        <Button
+                android:id="@+id/btn_open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_bg"
+                android:padding="10dp"
+                android:text="清空內容"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:layout_gravity="center"/>
+    </LinearLayout>
 </FrameLayout>
