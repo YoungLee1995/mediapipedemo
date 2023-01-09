@@ -7,14 +7,12 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.testdemo.databinding.KeyBoardAtBinding
-import com.open.androidtvwidget.keyboard.SoftKey
-import com.open.androidtvwidget.keyboard.SoftKeyBoardListener
 
 /**
  * 软键盘页面
  */
 class KeyBoardAt : AppCompatActivity() {
-    var mOldSoftKey: SoftKey? = null
+    //var mOldSoftKey: SoftKey? = null
     private lateinit var binding: KeyBoardAtBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,12 +20,12 @@ class KeyBoardAt : AppCompatActivity() {
         setContentView(binding.root)
 
         //binding.skbContainer.setSkbLayout(R.xml.sbd_qwerty)
-        binding.skbContainer.isFocusable = true
-        binding.skbContainer.isFocusableInTouchMode = true
+        //binding.skbContainer.isFocusable = true
+        //binding.skbContainer.isFocusableInTouchMode = true
         // 设置属性(默认是不移动的选中边框)
         setSkbContainerMove()
         //
-        binding.skbContainer.setSelectSofkKeyFront(true) // 设置选中边框最前面.
+        //binding.skbContainer.setSelectSofkKeyFront(true) // 设置选中边框最前面.
 
         // 监听键盘事件.
         /*binding.skbContainer.setOnSoftKeyBoardListener(object : SoftKeyBoardListener {
@@ -71,8 +69,8 @@ class KeyBoardAt : AppCompatActivity() {
             }
         })*/
         // DEMO（测试键盘失去焦点和获取焦点)
-        binding.skbContainer.setOnFocusChangeListener { v, hasFocus ->
-            /*OPENLOG.D("hasFocus:$hasFocus")
+        /*binding.skbContainer.setOnFocusChangeListener { v, hasFocus ->
+            OPENLOG.D("hasFocus:$hasFocus")
             if (hasFocus) {
                 if (mOldSoftKey != null) skbContainer.setKeySelected(mOldSoftKey) else skbContainer.setDefualtSelectKey(
                     0,
@@ -81,12 +79,12 @@ class KeyBoardAt : AppCompatActivity() {
             } else {
                 mOldSoftKey = skbContainer.getSelectKey()
                 skbContainer.setKeySelected(null)
-            }*/
-        }
+            }
+        }*/
     }
 
     private fun setSkbContainerMove() {
-        mOldSoftKey = null
+        /*mOldSoftKey = null
         binding.skbContainer.setMoveSoftKey(true) // 设置是否移动按键边框.
         val rectf = RectF(5f,
             5f,
@@ -94,6 +92,6 @@ class KeyBoardAt : AppCompatActivity() {
             5f)
         binding.skbContainer.setSoftKeySelectPadding(rectf) // 设置移动边框相差的间距.
         binding.skbContainer.setMoveDuration(200) // 设置移动边框的时间(默认:300)
-        binding.skbContainer.setSelectSofkKeyFront(true) // 设置选中边框在最前面.
+        binding.skbContainer.setSelectSofkKeyFront(true) // 设置选中边框在最前面.*/
     }
 }

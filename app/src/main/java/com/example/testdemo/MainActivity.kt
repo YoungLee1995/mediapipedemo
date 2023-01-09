@@ -138,15 +138,8 @@ class MainActivity : AppCompatActivity() {
             keyContent.setLength(0)
             binding.keyboardContent.text = keyContent.toString()
             //把当前选中的View重置回去
-            selectView?.let {
-                it.setBackgroundResource(R.drawable.keyboard_btn_bg)
-                val objectAnimationX = ObjectAnimator.ofFloat(it, "scaleX", 0.9f,1f)
-                val objectAnimationY = ObjectAnimator.ofFloat(it, "scaleY", 0.9f,1f)
-                val animationSet = AnimatorSet()
-                animationSet.play(objectAnimationX)?.with(objectAnimationY)
-                animationSet.duration = 200
-                animationSet.start()
-            }
+            recoverySelectView()
+            selectView = null
         }
     }
 
