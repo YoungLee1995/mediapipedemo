@@ -1,21 +1,27 @@
 package com.example.testdemo
 
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Point
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.ViewPropertyAnimator
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
 import com.google.gson.Gson
-import com.google.mediapipe.components.PermissionHelper
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
@@ -26,6 +32,10 @@ import com.google.mediapipe.solutions.hands.HandsResult
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.flow
+import java.lang.Runnable
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * 摄像头展示界面
@@ -40,6 +50,9 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private lateinit var keyboard:TestKeyBoard
     private val keyContent:StringBuffer = StringBuffer()
+    private val keyBoardViewMap = HashMap<Int,TextView>()
+    private var animation: AnimatorSet?=null
+    private var selectView :TextView?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -84,11 +97,8 @@ class MainActivity : AppCompatActivity() {
         keyboard.Init()
         //动态绘制键盘View
         binding.keyboardLayout.removeAllViewsInLayout()
-        Log.v("Main11111111","${keyboard.testKeyMap.size}")
+        keyBoardViewMap.clear()
         for ((key,keyboard) in keyboard.testKeyMap){
-            Log.v("MainAc数据","$key")
-            Log.v("MainAc坐标","X:${(keyboard.position.pixel_x).toFloat()}===Y:${(keyboard.position.pixel_y).toFloat()}")
-            Log.v("MainAc宽高","width:${keyboard.keyShape.key_width.toInt()}===height:${keyboard.keyShape.key_height.toInt()}")
             val textView = TextView(this)
             textView.x = (keyboard.position.pixel_x).toFloat()
             textView.y = (keyboard.position.pixel_y).toFloat()
@@ -101,6 +111,8 @@ class MainActivity : AppCompatActivity() {
             textView.setTextColor(ContextCompat.getColor(this, R.color.white))
             textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
             binding.keyboardLayout.addView(textView)
+            //把按钮的View对象存储起来
+            keyBoardViewMap[key] = textView
         }
         /*for (i in 0..9){
             val map = keyboard.testKeyMap[i]
@@ -125,6 +137,16 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpen.setOnClickListener {
             keyContent.setLength(0)
             binding.keyboardContent.text = keyContent.toString()
+            //把当前选中的View重置回去
+            selectView?.let {
+                it.setBackgroundResource(R.drawable.keyboard_btn_bg)
+                val objectAnimationX = ObjectAnimator.ofFloat(it, "scaleX", 0.9f,1f)
+                val objectAnimationY = ObjectAnimator.ofFloat(it, "scaleY", 0.9f,1f)
+                val animationSet = AnimatorSet()
+                animationSet.play(objectAnimationX)?.with(objectAnimationY)
+                animationSet.duration = 200
+                animationSet.start()
+            }
         }
     }
 
@@ -298,7 +320,7 @@ class MainActivity : AppCompatActivity() {
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
 
 
-            Log.v("食指X坐标","${optimizedMarks.aveOptMarks.markList.last.jointPoint[8].pixel_x}")
+            /*Log.v("食指X坐标","${optimizedMarks.aveOptMarks.markList.last.jointPoint[8].pixel_x}")
             val size = optimizedMarks.aveOptMarks.historyMoveSign.size
             if(size>5){
                 val logStr = StringBuffer()
@@ -311,7 +333,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 L.v("是否按下：$isKeyPushed,长度：$size==>$logStr")
-            }
+            }*/
             if(isFingerOnKey&&isKeyPushed){
                 //L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
                 if(keyContent.isEmpty()){
@@ -320,6 +342,50 @@ class MainActivity : AppCompatActivity() {
                     keyContent.append(",${keyboard.testKeyMap[intKeyId]?.id}")
                 }
                 binding.keyboardContent.post {
+                    keyBoardViewMap[intKeyId]?.let { keyView->
+                        if(selectView!=null){
+                            //重置之前的View为原始状态
+                            recoverySelectView()
+                        }
+                        //设置选中的View效果
+                        selectView = keyView
+                        keyView.setBackgroundResource(R.drawable.keyboard_btn_press_bg)
+                        if(animation!=null){
+                            //取消之前沒有完成的动画
+                            animation?.cancel()
+                        }
+                        val objectAnimationX = ObjectAnimator.ofFloat(keyView, "scaleX", 1f,0.9f)
+                        val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
+                        animation = AnimatorSet()
+                        animation?.play(objectAnimationX)?.with(objectAnimationY)
+                        animation?.duration = 300
+                        animation?.addListener(object :AnimatorListener{
+
+                            override fun onAnimationStart(animation: Animator) {
+                            }
+
+                            override fun onAnimationEnd(animation: Animator) {
+                                lifecycleScope.coroutineContext.cancelChildren()
+                                lifecycleScope.launch {
+                                    flow<Boolean> {
+                                        delay(1.seconds)
+                                        emit(true)
+                                    }.collect{
+                                        //取消缩放效果 恢复原始状态
+                                        recoverySelectView()
+                                    }
+                                }
+                            }
+
+                            override fun onAnimationCancel(animation: Animator) {
+                            }
+
+                            override fun onAnimationRepeat(animation: Animator) {
+                            }
+
+                        })
+                        animation?.start()
+                    }
                     binding.keyboardContent.text = keyContent.toString()
                 }
             }
@@ -340,7 +406,16 @@ class MainActivity : AppCompatActivity() {
                 wristWorldLandmark.x, wristWorldLandmark.y, wristWorldLandmark.z
             )
         )*/
-
-
+    }
+    private fun recoverySelectView(){
+        selectView?.let {
+            it.setBackgroundResource(R.drawable.keyboard_btn_bg)
+            val objectAnimationX = ObjectAnimator.ofFloat(it, "scaleX", 0.9f,1f)
+            val objectAnimationY = ObjectAnimator.ofFloat(it, "scaleY", 0.9f,1f)
+            val animationSet = AnimatorSet()
+            animationSet.play(objectAnimationX)?.with(objectAnimationY)
+            animationSet.duration = 200
+            animationSet.start()
+        }
     }
 }

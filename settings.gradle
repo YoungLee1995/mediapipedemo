@@ -15,4 +15,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "TestDemo"
 include ':app'
-include ':androidtvwidget'

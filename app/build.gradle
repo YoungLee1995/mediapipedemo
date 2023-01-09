@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.example.testdemo'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.testdemo"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -48,8 +48,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
-    implementation project(':androidtvwidget')
-
     // MediaPipe Hands Solution.
     implementation 'com.google.mediapipe:solution-core:latest.release'
     implementation 'com.google.mediapipe:hands:latest.release'
@@ -60,4 +58,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
     //动态权限
     implementation 'com.github.getActivity:XXPermissions:16.6'
+
+    //协程依赖
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3'
+
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha03'
 }
