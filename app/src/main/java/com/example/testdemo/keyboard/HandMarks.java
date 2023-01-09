@@ -5,6 +5,7 @@ import java.util.LinkedList;
 public class HandMarks {
     public LinkedList<HandMark> markList =new LinkedList<HandMark>();
     public LinkedList<Boolean> historyMoveSign =new LinkedList<>();
+    public LinkedList<Boolean> historyPushSign =new LinkedList<>();
     private int ID;
 
     public int getID() {
@@ -15,20 +16,24 @@ public class HandMarks {
         this.ID = ID;
     }
 
-    public void push(HandMark h,Boolean b){
+    public void pushback(HandMark h, Boolean b){
         this.markList.add(h);
-        this.historyMoveSign.add(b);
+        this.historyMoveSign.addLast(b);
+        this.historyPushSign.addLast(b);
     }
     public void pushFront(HandMark h,Boolean b){
         this.markList.addFirst(h);
         this.historyMoveSign.addFirst(b);
+        this.historyPushSign.addFirst(b);
     }
-    public void pop(){
-        this.markList.pop();
-        this.historyMoveSign.pop();
+    public void poplast(){
+        this.markList.removeLast();
+        this.historyMoveSign.removeLast();
+        this.historyPushSign.removeLast();
     }
     public void popfront(){
-        this.markList.poll();   //移除队列第一个元素
-        this.historyMoveSign.poll();
+        this.markList.removeFirst();   //移除队列第一个元素
+        this.historyMoveSign.removeFirst();
+        this.historyPushSign.removeFirst();
     }
 }

@@ -1,5 +1,7 @@
 package com.example.testdemo.keyboard;
 
+import java.util.Objects;
+
 public class FingerDetect {
 
     public static int pushedKey(Position finger1_position){
@@ -8,9 +10,9 @@ public class FingerDetect {
         double distance=Double.MAX_VALUE;
         int id=0;
         for(int i=0;i<testKeyBoard.testKeyMap.size();i++){
-            double d=Distance.pixel_distance(finger1_position,testKeyBoard.testKeyMap.get(i).getPosition());
+            double d=Distance.pixel_distance(finger1_position, Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getPosition());
             if(d<distance){
-                id=testKeyBoard.testKeyMap.get(i).getId();
+                id= Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getId();
                 distance=d;
             }
         }
@@ -22,10 +24,7 @@ public class FingerDetect {
         TestKeyBoard testKeyBoard=new TestKeyBoard();
         testKeyBoard.Init();
         //此处确定是否落入键盘的标准
-        if(Distance.pixelDistanceL1(finger1_position,testKeyBoard.testKeyMap.get(id).getPosition())<300){
-            return true;
-        }
-        return false;
+        return Distance.pixelDistanceL1(finger1_position, Objects.requireNonNull(testKeyBoard.testKeyMap.get(id)).getPosition()) < 300;
     }
     public static boolean isKeyPushed(HandMarks handMarks){
         boolean[] signList=new boolean[12];
@@ -35,9 +34,9 @@ public class FingerDetect {
             if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num).jointPoint[8].getLocation_z()>2.5){
                 signList[i]=true;
             }
-            if(handMarks.historyMoveSign.get(num)==true){
+            if(handMarks.historyMoveSign.get(num)){
                 int index=0;
-                while(num+index<signList.length&&handMarks.historyMoveSign.get(num+index)==true){
+                while(num+index<signList.length&&handMarks.historyMoveSign.get(num+index)){
                     index++;
                 }
                 if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num+index).jointPoint[8].getLocation_z()>-0.5){
@@ -50,15 +49,14 @@ public class FingerDetect {
                 totalSign++;
             }
         }
-        if(totalSign/10>0.7){
-            handMarks.historyMoveSign.pop();
+        if(totalSign/10.0>0.7){
+            handMarks.historyMoveSign.removeLast();
             handMarks.historyMoveSign.addLast(true);
         }
-        if(handMarks.historyMoveSign.getLast()&&!handMarks.historyMoveSign.get(handMarks.historyMoveSign.size()-2)){
-            return true;
-        }
 
-        return false;
+        int historyWeightSign;
+        boolean historyPushed;
+        return handMarks.historyMoveSign.getLast() && !handMarks.historyMoveSign.get(handMarks.historyMoveSign.size() - 2);
     }
 }
 
