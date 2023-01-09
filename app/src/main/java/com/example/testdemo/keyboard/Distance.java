@@ -13,4 +13,9 @@ public class Distance {
         double d=Math.abs(dx)+Math.abs(dy);
         return d;
     }
+    public static double pixelDistanceMax(Position p1, Position p2){
+        double dx=Math.abs(p1.getPixel_x()-p2.getPixel_x());
+        double dy=Math.abs(p1.getPixel_y()-p2.getPixel_y());
+        return Math.max(dx,dy);
+    }
 }

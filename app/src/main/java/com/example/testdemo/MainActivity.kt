@@ -1,23 +1,31 @@
 package com.example.testdemo
 
+import android.graphics.Point
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
+import com.google.gson.Gson
 import com.google.mediapipe.components.PermissionHelper
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
+import com.google.mediapipe.solutions.hands.HandLandmark
 import com.google.mediapipe.solutions.hands.Hands
 import com.google.mediapipe.solutions.hands.HandsOptions
 import com.google.mediapipe.solutions.hands.HandsResult
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 
 /**
  * 摄像头展示界面
@@ -37,13 +45,21 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initView()
-        //启动功能
-        setupLiveDemoUiComponents()
+        ///启动功能
+        initData()
+        //setupLiveDemoUiComponents()
+
+        val windowManager: WindowManager = window.windowManager
+        val point = Point()
+        windowManager.defaultDisplay.getRealSize(point)
+        //屏幕实际宽度（像素个数）
+        val width: Int = point.x
+        //屏幕实际高度（像素个数）
+        val height: Int = point.y
+        Log.v("MainAc多少","$width-----$height")
     }
 
     private fun initView() {
-        // 获取权限
-        PermissionHelper.checkAndRequestCameraPermissions(this)
         /*binding.btnOpen.setOnClickListener {
             startActivity(Intent(this,KeyBoardAt::class.java))
         }*/
@@ -68,7 +84,25 @@ class MainActivity : AppCompatActivity() {
         keyboard.Init()
         //动态绘制键盘View
         binding.keyboardLayout.removeAllViewsInLayout()
-        for (i in 0..9){
+        Log.v("Main11111111","${keyboard.testKeyMap.size}")
+        for ((key,keyboard) in keyboard.testKeyMap){
+            Log.v("MainAc数据","$key")
+            Log.v("MainAc坐标","X:${(keyboard.position.pixel_x).toFloat()}===Y:${(keyboard.position.pixel_y).toFloat()}")
+            Log.v("MainAc宽高","width:${keyboard.keyShape.key_width.toInt()}===height:${keyboard.keyShape.key_height.toInt()}")
+            val textView = TextView(this)
+            textView.x = (keyboard.position.pixel_x).toFloat()
+            textView.y = (keyboard.position.pixel_y).toFloat()
+            val params = FrameLayout.LayoutParams(keyboard.keyShape.key_width.toInt(), keyboard.keyShape.key_height.toInt())
+            textView.layoutParams = params
+            textView.text = "$key"
+            textView.gravity = Gravity.CENTER
+            textView.textSize = 20f
+            textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
+            textView.setTextColor(ContextCompat.getColor(this, R.color.white))
+            textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
+            binding.keyboardLayout.addView(textView)
+        }
+        /*for (i in 0..9){
             val map = keyboard.testKeyMap[i]
             map?.let { keyboard ->
                 val textView = TextView(this)
@@ -84,12 +118,6 @@ class MainActivity : AppCompatActivity() {
                 textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
                 binding.keyboardLayout.addView(textView)
             }
-        }
-
-        /*for (j in 0..2) {
-            for (i in 0..6) {
-
-            }
         }*/
         binding.keyboardLayout.requestLayout()
 
@@ -100,20 +128,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*override fun onResume() {
-        super.onResume()
-        if (PermissionHelper.cameraPermissionsGranted(this)) {
-            setupLiveDemoUiComponents()
-        }
-    }*/
+    private fun initData(){
+        XXPermissions.with(this)
+            // 申请单个权限
+            .permission(Permission.CAMERA)
+            // 设置权限请求拦截器（局部设置）
+            //.interceptor(new PermissionInterceptor())
+            // 设置不触发错误检测机制（局部设置）
+            //.unchecked()
+            .request(object : OnPermissionCallback {
+                override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
+                    if (!allGranted) {
+                        Toast.makeText(this@MainActivity,"获取部分权限成功，但部分权限未正常授予",Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    setupLiveDemoUiComponents()
+                }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
+                override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
+                    if (doNotAskAgain) {
+                        Toast.makeText(this@MainActivity,"被永久拒绝授权,请手动授予相机权限",Toast.LENGTH_SHORT).show()
+                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                        XXPermissions.startPermissionActivity(this@MainActivity, permissions)
+                    } else {
+                        Toast.makeText(this@MainActivity,"获取相机权限失败",Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
     }
 
     /**设置带有摄像头输入的实时演示的UI组件*/
@@ -238,8 +279,9 @@ class MainActivity : AppCompatActivity() {
         if(landmark.isEmpty()&&normalizedLandmark.isEmpty()){
             return
         }
-        L.v("長度---${landmark.size}----${normalizedLandmark.size}")
+        //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
+        L.v(Gson().toJson(normalizedLandmark[HandLandmark.INDEX_FINGER_TIP]))
         val handMark = HandMark.lm2hm(landmark, normalizedLandmark)
 
         //判断是否满足120帧
@@ -255,10 +297,23 @@ class MainActivity : AppCompatActivity() {
             val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
 
-            L.v("$isFingerOnKey-----$isKeyPushed")
-            if(isFingerOnKey&&isKeyPushed){
-                L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
 
+            Log.v("食指X坐标","${optimizedMarks.aveOptMarks.markList.last.jointPoint[8].pixel_x}")
+            val size = optimizedMarks.aveOptMarks.historyMoveSign.size
+            if(size>5){
+                val logStr = StringBuffer()
+                for (i in size-5 until size){
+                    if(logStr.isEmpty()){
+                        logStr.append(optimizedMarks.aveOptMarks.historyMoveSign[i])
+                    }else{
+                        logStr.append("==${optimizedMarks.aveOptMarks.historyMoveSign[i]}")
+                    }
+                }
+
+                L.v("是否按下：$isKeyPushed,长度：$size==>$logStr")
+            }
+            if(isFingerOnKey&&isKeyPushed){
+                //L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
                 if(keyContent.isEmpty()){
                     keyContent.append(keyboard.testKeyMap[intKeyId]?.id)
                 }else{
@@ -270,14 +325,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
         /*val wristWorldLandmark =
             result.multiHandWorldLandmarks()[0].landmarkList[HandLandmark.INDEX_FINGER_TIP]
-
-        L.v(
+*/
+        /*L.v(
             String.format(
-                "WorldLandmarks-------INDEX_FINGER_TIP:x=%f m, y=%f m, z=%f m",
-                wristWorldLandmark.x, wristWorldLandmark.y, wristWorldLandmark.z
+                "WorldLandmarks-------INDEX_FINGER_TIP: z=%f m", wristWorldLandmark.z
             )
         )*/
         /*Log.i(

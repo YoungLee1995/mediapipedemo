@@ -31,8 +31,8 @@ public class HandMark {
             position.setLocation_x(l.get(i).getX()*1000);
             position.setLocation_y(l.get(i).getY()*1000);
             position.setLocation_z(l.get(i).getZ()*1000);
-            position.setPixel_x(nl.get(i).getX()*1080);
-            position.setPixel_y(nl.get(i).getY()*1920);
+            position.setPixel_x(nl.get(i).getX()*1440);
+            position.setPixel_y(nl.get(i).getY()*3200);
             result.jointPoint[i]=position;
         }
         return result;

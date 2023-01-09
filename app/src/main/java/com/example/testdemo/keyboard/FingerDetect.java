@@ -10,7 +10,12 @@ public class FingerDetect {
         double distance=Double.MAX_VALUE;
         int id=0;
         for(int i=0;i<testKeyBoard.testKeyMap.size();i++){
-            double d=Distance.pixel_distance(finger1_position, Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getPosition());
+            Position keyCenter = Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getPosition();
+            double x=keyCenter.getPixel_x();
+            double y=keyCenter.getPixel_y();
+            keyCenter.setPixel_x(x+250);
+            keyCenter.setPixel_y(y+250);
+            double d=Distance.pixelDistanceMax(finger1_position, keyCenter);
             if(d<distance){
                 id= Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getId();
                 distance=d;
@@ -24,7 +29,12 @@ public class FingerDetect {
         TestKeyBoard testKeyBoard=new TestKeyBoard();
         testKeyBoard.Init();
         //此处确定是否落入键盘的标准
-        return Distance.pixelDistanceL1(finger1_position, Objects.requireNonNull(testKeyBoard.testKeyMap.get(id)).getPosition()) < 300;
+        Position keyCenter = Objects.requireNonNull(testKeyBoard.testKeyMap.get(id)).getPosition();
+        double x=keyCenter.getPixel_x();
+        double y=keyCenter.getPixel_y();
+        keyCenter.setPixel_x(x+250);
+        keyCenter.setPixel_y(y+250);
+        return Distance.pixelDistanceMax(finger1_position, keyCenter) < 200;
     }
     public static boolean isKeyPushed(HandMarks handMarks){
         boolean[] signList=new boolean[12];
