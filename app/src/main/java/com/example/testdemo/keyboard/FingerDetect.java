@@ -36,6 +36,22 @@ public class FingerDetect {
         keyCenter.setPixel_y(y+250);
         return Distance.pixelDistanceMax(finger1_position, keyCenter) < 200;
     }
+
+    public static boolean isFingerOnKey(HandMarks handMarks){
+        int totalSign=0;
+        int hmSize=handMarks.markList.size();
+        if(hmSize<119) return false;
+        //统计近40帧手指是否都位于当前帧所在按键内
+        for(int i=0;i<40;i++){
+            int num=hmSize-40+i;
+            if(handMarks.historyKey.get(i)==handMarks.historyKey.getLast()&&handMarks.historyFOnKSign.get(i)){
+                hmSize++;
+            }
+        }
+
+        return hmSize>35&&handMarks.historyFOnKSign.getLast();
+    }
+
     public static boolean isKeyPushed(HandMarks handMarks){
         boolean[] signList=new boolean[12];
         int totalSign=0;
@@ -63,10 +79,14 @@ public class FingerDetect {
             handMarks.historyMoveSign.removeLast();
             handMarks.historyMoveSign.addLast(true);
         }
+        boolean isFingerOnKey=FingerDetect.isFingerOnKey(handMarks);
+        boolean isKeyPushed=handMarks.historyMoveSign.getLast() && !handMarks.historyMoveSign.get(handMarks.historyMoveSign.size() - 2)&&isFingerOnKey;
+        if(isKeyPushed){
+            handMarks.historyPushSign.removeLast();
+            handMarks.historyPushSign.addLast(true);
+        }
 
-        int historyWeightSign;
-        boolean historyPushed;
-        return handMarks.historyMoveSign.getLast() && !handMarks.historyMoveSign.get(handMarks.historyMoveSign.size() - 2);
+        return isKeyPushed;
     }
 }
 

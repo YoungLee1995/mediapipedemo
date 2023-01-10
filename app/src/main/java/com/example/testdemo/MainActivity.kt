@@ -301,18 +301,19 @@ class MainActivity : AppCompatActivity() {
 
         //判断是否满足120帧
         if (optimizedMarks.aveOptMarks.markList.size < 120) {
-            //存储帧数据
-            optimizedMarks.pushback(handMark)
+            //计算各信号值，存储前120帧数据
+            val position = handMark.jointPoint[8]
+            val intKeyId= FingerDetect.pushedKey(position)
+            val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
+            optimizedMarks.pushback(handMark,intKeyId,false,false,isFingerOnKey)
         } else {
             //满足120帧  先删除第一针
-            optimizedMarks.popfront()
-            optimizedMarks.pushback(handMark)
             val position = optimizedMarks.aveOptMarks.markList.last.jointPoint[8]
             val intKeyId= FingerDetect.pushedKey(position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
+            optimizedMarks.popfront()
+            optimizedMarks.pushback(handMark,intKeyId,false,false,isFingerOnKey)
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
-
-
             /*Log.v("食指X坐标","${optimizedMarks.aveOptMarks.markList.last.jointPoint[8].pixel_x}")
             val size = optimizedMarks.aveOptMarks.historyMoveSign.size
             if(size>5){
@@ -327,7 +328,7 @@ class MainActivity : AppCompatActivity() {
 
                 L.v("是否按下：$isKeyPushed,长度：$size==>$logStr")
             }*/
-            if(isFingerOnKey&&isKeyPushed){
+            if(isKeyPushed){
                 //L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
                 if(keyContent.isEmpty()){
                     keyContent.append(keyboard.testKeyMap[intKeyId]?.id)
