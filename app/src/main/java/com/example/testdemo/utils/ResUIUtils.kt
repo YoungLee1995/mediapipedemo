@@ -1,5 +1,6 @@
-package com.example.testdemo
+package com.example.testdemo.utils
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Resources
@@ -19,7 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import com.example.testdemo.bean.ScreenPixelSize
 import java.io.ByteArrayOutputStream
 
 object ResUIUtils {
@@ -328,6 +329,15 @@ object ResUIUtils {
             p.setMargins(l, t, r, b)
             v.requestLayout()
         }
+    }
+
+    fun getScreenPixelSize(activity: Activity):ScreenPixelSize{
+        val windowManager: WindowManager = activity.windowManager
+        val point = Point()
+        windowManager.defaultDisplay.getRealSize(point)
+        //屏幕实际宽度（像素个数）
+        //屏幕实际高度（像素个数）
+        return ScreenPixelSize( point.x, point.y)
     }
 
 }

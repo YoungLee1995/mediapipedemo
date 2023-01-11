@@ -4,24 +4,24 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.graphics.Point
 import android.graphics.Typeface
+import android.hardware.Camera
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.ViewPropertyAnimator
-import android.view.WindowManager
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.example.testdemo.bean.ScreenPixelSize
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
-import com.google.gson.Gson
+import com.example.testdemo.utils.ResUIUtils
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.lang.Runnable
 import kotlin.time.Duration.Companion.seconds
+
 
 /**
  * 摄像头展示界面
@@ -53,23 +54,21 @@ class MainActivity : AppCompatActivity() {
     private val keyBoardViewMap = HashMap<Int,TextView>()
     private var animation: AnimatorSet?=null
     private var selectView :TextView?=null
+
+    private val handsView = mutableListOf<HandGestureView>()
+    private var pixelWidth:Int = 0
+    private var pixelHeight:Int = 0
+    private var screenSize :ScreenPixelSize?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        screenSize = ResUIUtils.getScreenPixelSize(this)
         initView()
         ///启动功能
         initData()
         //setupLiveDemoUiComponents()
-
-        val windowManager: WindowManager = window.windowManager
-        val point = Point()
-        windowManager.defaultDisplay.getRealSize(point)
-        //屏幕实际宽度（像素个数）
-        val width: Int = point.x
-        //屏幕实际高度（像素个数）
-        val height: Int = point.y
-        Log.v("MainAc多少","$width-----$height")
+        //find_camera_resolution()
     }
 
     private fun initView() {
@@ -114,25 +113,7 @@ class MainActivity : AppCompatActivity() {
             //把按钮的View对象存储起来
             keyBoardViewMap[key] = textView
         }
-        /*for (i in 0..9){
-            val map = keyboard.testKeyMap[i]
-            map?.let { keyboard ->
-                val textView = TextView(this)
-                textView.x = (keyboard.position.pixel_x).toFloat()
-                textView.y = (keyboard.position.pixel_y).toFloat()
-                val params = FrameLayout.LayoutParams(keyboard.keyShape.key_width.toInt(), keyboard.keyShape.key_height.toInt())
-                textView.layoutParams = params
-                textView.text = "$i"
-                textView.gravity = Gravity.CENTER
-                textView.textSize = 20f
-                textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
-                textView.setTextColor(ContextCompat.getColor(this, R.color.white))
-                textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
-                binding.keyboardLayout.addView(textView)
-            }
-        }*/
         binding.keyboardLayout.requestLayout()
-
 
         binding.btnOpen.setOnClickListener {
             keyContent.setLength(0)
@@ -140,6 +121,31 @@ class MainActivity : AppCompatActivity() {
             //把当前选中的View重置回去
             recoverySelectView()
             selectView = null
+        }
+
+        /*binding.keyboardLayout.post {
+            pixelWidth = binding.keyboardLayout.width
+            pixelHeight = binding.keyboardLayout.height
+            Log.v("多少111","$pixelWidth==$pixelHeight")
+        }*/
+
+        binding.keyboardLayout.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (Build.VERSION.SDK_INT >= 16) {
+                    binding.keyboardLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                } else {
+                    binding.keyboardLayout.viewTreeObserver.removeGlobalOnLayoutListener(this)
+                }
+                pixelWidth = binding.keyboardLayout.width
+                pixelHeight = binding.keyboardLayout.height
+            }
+        })
+        binding.flHandSpot.removeAllViewsInLayout()
+        handsView.clear()
+        for (i in 0..20){
+            val handGestureView = HandGestureView(this)
+            binding.flHandSpot.addView(handGestureView)
+            handsView.add(handGestureView)
         }
     }
 
@@ -227,6 +233,11 @@ class MainActivity : AppCompatActivity() {
                 it
             )
         }
+        /*val params = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT)
+        params.width = pixelWidth
+        params.height = pixelHeight
+        glSurfaceView?.layoutParams = params*/
+
         glSurfaceView?.setSolutionResultRenderer(HandsResultGlRenderer())
         glSurfaceView?.setRenderInputImage(true)
         hands?.setResultListener { handsResult: HandsResult ->
@@ -259,9 +270,9 @@ class MainActivity : AppCompatActivity() {
     val handMarks = HandMarks()
     val optimizedMarks = OptimizedMarks()
     private fun logWristLandmark(result: HandsResult, showPixelValues: Boolean) {
-        if (result.multiHandLandmarks().isEmpty()) {
+        /*if (result.multiHandLandmarks().isEmpty()) {
             return
-        }
+        }*/
         //val wristLandmark = result.multiHandLandmarks()[0].landmarkList[HandLandmark.WRIST]
         // 对于位图，显示像素值。对于纹理输入，显示规格化坐标。
         /*if (showPixelValues) {
@@ -281,9 +292,13 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }*/
-        if (result.multiHandWorldLandmarks().isEmpty()) {
+        if (result.multiHandWorldLandmarks().isEmpty()||result.multiHandLandmarks().isEmpty()) {
+            binding.flHandSpot.post{
+                binding.flHandSpot.visibility = View.GONE
+            }
             return
         }
+
         //multiHandLandmarks  像素坐标  multiHandWorldLandmarks  真实坐标
         //L.v(Gson().toJson(result.multiHandLandmarks()))
         //获取真实坐标
@@ -292,11 +307,35 @@ class MainActivity : AppCompatActivity() {
         val normalizedLandmark = result.multiHandLandmarks()[0].landmarkList
 
         if(landmark.isEmpty()&&normalizedLandmark.isEmpty()){
+            binding.flHandSpot.post{
+                binding.flHandSpot.visibility = View.GONE
+            }
             return
         }
+        binding.flHandSpot.post {
+            if(binding.flHandSpot.visibility == View.GONE){
+                binding.flHandSpot.visibility = View.VISIBLE
+            }
+            //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
+            val widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+            Log.v("多少","$pixelHeight===$widthSize===${screenSize?.screenWidth}")
+            for ((index,item) in normalizedLandmark.withIndex()){
+                //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即23
+                val pixelX = (item.x*widthSize-(widthSize-screenSize?.screenWidth!!)/2.0)-23.0
+                val pixelY = item.y*pixelHeight-23
+                val view = handsView[index]
+                if(index==0){
+                    Log.v("多少","$pixelX")
+                }
+                view.x = pixelX.toFloat()
+                view.y = pixelY
+            }
+        }
+
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        L.v(Gson().toJson(normalizedLandmark[HandLandmark.INDEX_FINGER_TIP]))
+        val hand= normalizedLandmark[HandLandmark.WRIST]
+        L.v("${hand.x}-----${hand.y}")
         val handMark = HandMark.lm2hm(landmark, normalizedLandmark)
 
         //判断是否满足120帧
@@ -314,20 +353,6 @@ class MainActivity : AppCompatActivity() {
             optimizedMarks.popfront()
             optimizedMarks.pushback(handMark,intKeyId,false,false,isFingerOnKey)
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
-            /*Log.v("食指X坐标","${optimizedMarks.aveOptMarks.markList.last.jointPoint[8].pixel_x}")
-            val size = optimizedMarks.aveOptMarks.historyMoveSign.size
-            if(size>5){
-                val logStr = StringBuffer()
-                for (i in size-5 until size){
-                    if(logStr.isEmpty()){
-                        logStr.append(optimizedMarks.aveOptMarks.historyMoveSign[i])
-                    }else{
-                        logStr.append("==${optimizedMarks.aveOptMarks.historyMoveSign[i]}")
-                    }
-                }
-
-                L.v("是否按下：$isKeyPushed,长度：$size==>$logStr")
-            }*/
             if(isKeyPushed){
                 //L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
                 if(keyContent.isEmpty()){
@@ -352,7 +377,7 @@ class MainActivity : AppCompatActivity() {
                         val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
                         animation = AnimatorSet()
                         animation?.play(objectAnimationX)?.with(objectAnimationY)
-                        animation?.duration = 300
+                        animation?.duration = 200
                         animation?.addListener(object :AnimatorListener{
 
                             override fun onAnimationStart(animation: Animator) {
@@ -367,6 +392,7 @@ class MainActivity : AppCompatActivity() {
                                     }.collect{
                                         //取消缩放效果 恢复原始状态
                                         recoverySelectView()
+                                        selectView = null
                                     }
                                 }
                             }
@@ -411,5 +437,72 @@ class MainActivity : AppCompatActivity() {
             animationSet.duration = 200
             animationSet.start()
         }
+    }
+
+    private var mPreviewScale:Float= 0f
+    private var mPreviewWidth:Int = 0
+    private var mPreviewHeight:Int = 0
+    fun find_camera_resolution() {
+        val mCamera: Camera = Camera.open()
+        val params: Camera.Parameters = mCamera.getParameters()
+        val vSizes : List<Camera.Size> = params.getSupportedPreviewSizes()
+
+        //获取和屏幕比列相近的 一个尺寸
+        val previewSize: Camera.Size = getSuitableSize(vSizes)
+//重新定义 宽和高 （宽始终小于高）
+        //重新定义 宽和高 （宽始终小于高）
+        val previewWidth = Math.min(previewSize.width, previewSize.height)
+        val previewHeight = Math.max(previewSize.width, previewSize.height)
+
+        //获取 最终 我们需要预览的大小比列
+        mPreviewScale = previewWidth * 1f / previewHeight;
+        //算出 最终 宽高
+        if (mPreviewWidth > previewWidth)
+            mPreviewHeight = (mPreviewWidth / mPreviewScale).toInt()
+        else if (mPreviewWidth < previewWidth)
+            mPreviewHeight = (mPreviewHeight * mPreviewScale).toInt()
+
+
+
+        Log.v("多少","$mPreviewWidth-----$mPreviewHeight")
+        //parameters.setPreviewSize(mPreviewWidth, mPreviewHeight); // 设置预览图像大小
+
+
+        //val widths = IntArray(params.getSupportedPreviewSizes().size)
+        //val heights = IntArray(params.getSupportedPictureSizes().size)
+        //var mSize: Camera.Size?
+        /*for (size in sizes) {
+            *//*Toast.makeText(
+                this,
+                "Available resolution:" + widths.size + "" + size.height,
+                Toast.LENGTH_LONG
+            ).show()
+            mSize = size*//*
+            Log.v("多少","宽：${size.width}====高：${size.height}")
+        }*/
+    }
+
+    private fun getSuitableSize(sizes : List<Camera.Size>):Camera.Size{
+        var minDelta = Int.MAX_VALUE // 最小的差值，初始值应该设置大点保证之后的计算中会被重置
+        var index = 0 // 最小的差值对应的索引坐标
+        for (i in 0 until sizes.size){
+            val previewSize = sizes[i]
+            Log.v(
+                TAG,
+                "SupportedPreviewSize, width: " + previewSize.width.toString() + ", height: " + previewSize.height
+            )
+            // 找到一个与设置的分辨率差值最小的相机支持的分辨率大小
+            if ((previewSize.width * mPreviewScale).toInt() === previewSize.height){
+                val delta: Int = Math.abs(mPreviewWidth - previewSize.width)
+                if (delta == 0) {
+                    return previewSize
+                }
+                if (minDelta > delta){
+                    minDelta = delta
+                    index = i
+                }
+            }
+        }
+        return sizes[index] // 默认返回与设置的分辨率最接近的预览尺寸
     }
 }

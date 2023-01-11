@@ -1,6 +1,7 @@
 package com.example.testdemo
 
 import androidx.multidex.MultiDexApplication
+import com.example.testdemo.utils.ResUIUtils
 
 /**
  * App启动入口

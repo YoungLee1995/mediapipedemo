@@ -25,6 +25,11 @@
         android:layout_height="match_parent">
 
     </FrameLayout>
+    <FrameLayout
+            android:id="@+id/fl_hand_spot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
     <!--<Button
         android:id="@+id/btn_open"
         android:layout_width="wrap_content"
@@ -63,4 +68,9 @@
                 android:textSize="24sp"
                 android:layout_gravity="center"/>
     </LinearLayout>
+
+    <!--<com.example.testdemo.HandGestureView
+            android:id="@+id/hand_gesture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>-->
 </FrameLayout>
