@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "TestDemo"
 include ':app'
+include ':usbtestdemo'

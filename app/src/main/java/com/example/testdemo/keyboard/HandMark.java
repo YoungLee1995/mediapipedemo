@@ -24,15 +24,15 @@ public class HandMark {
         this.ID = ID;
     }
 
-    public static HandMark lm2hm(List<LandmarkProto.Landmark> l, List<LandmarkProto.NormalizedLandmark> nl){
+    public static HandMark lm2hm(int width,int pixelWidth,int height,List<LandmarkProto.Landmark> l, List<LandmarkProto.NormalizedLandmark> nl){
         HandMark result=new HandMark();
         for(int i=0;i<l.size();i++){
             Position position=new Position();
             position.setLocation_x(l.get(i).getX()*1000);
             position.setLocation_y(l.get(i).getY()*1000);
             position.setLocation_z(l.get(i).getZ()*1000);
-            position.setPixel_x(nl.get(i).getX()*1440);
-            position.setPixel_y(nl.get(i).getY()*3200);
+            position.setPixel_x(nl.get(i).getX()*width-(width-pixelWidth)/2);
+            position.setPixel_y(nl.get(i).getY()*height);
             result.jointPoint[i]=position;
         }
         return result;

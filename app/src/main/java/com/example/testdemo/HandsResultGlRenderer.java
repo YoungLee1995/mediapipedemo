@@ -92,7 +92,7 @@ public class HandsResultGlRenderer implements ResultGlRenderer<HandsResult> {
       drawConnections(
           result.multiHandLandmarks().get(i).getLandmarkList(),
           isLeftHand ? LEFT_HAND_CONNECTION_COLOR : RIGHT_HAND_CONNECTION_COLOR);
-      for (NormalizedLandmark landmark : result.multiHandLandmarks().get(i).getLandmarkList()) {
+      /*for (NormalizedLandmark landmark : result.multiHandLandmarks().get(i).getLandmarkList()) {
         // Draws the landmark.
         drawCircle(
             landmark.getX(),
@@ -103,7 +103,7 @@ public class HandsResultGlRenderer implements ResultGlRenderer<HandsResult> {
             landmark.getX(),
             landmark.getY(),
             isLeftHand ? LEFT_HAND_HOLLOW_CIRCLE_COLOR : RIGHT_HAND_HOLLOW_CIRCLE_COLOR);
-      }
+      }*/
     }
   }
 

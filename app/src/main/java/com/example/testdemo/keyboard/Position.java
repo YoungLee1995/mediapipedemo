@@ -1,12 +1,6 @@
 package com.example.testdemo.keyboard;
 
 public class Position {
-    Position(){};
-    Position(double x,double y){
-        pixel_x=x;
-        pixel_y=y;
-    }
-
     private double location_x;
     private double location_y;
     private double location_z;

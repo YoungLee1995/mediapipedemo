@@ -53,10 +53,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
+                android:layout_margin="20dp"
                 android:textColor="@color/white"
                 android:background="@drawable/button_bg"/>
 
-        <Button
+        <!--<Button
                 android:id="@+id/btn_open"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +67,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/black"
                 android:textSize="24sp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"/>-->
     </LinearLayout>
 
     <!--<com.example.testdemo.HandGestureView

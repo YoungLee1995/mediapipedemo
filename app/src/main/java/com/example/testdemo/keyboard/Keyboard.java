@@ -1,12 +1,18 @@
 package com.example.testdemo.keyboard;
 
 public class Keyboard {
-    Keyboard(){}
+    /*Keyboard(){}
     Keyboard(Position p,KeyShape k){
         position=p;
         keyShape=k;
-    }
+    }*/
+    private int id;
+    public Position position;
+    public KeyShape keyShape;
+
     Keyboard(double x,double y,double z,double width,double height,double depth){
+        position = new Position();
+        keyShape = new KeyShape();
         position.setPixel_x(x);
         position.setPixel_y(y);
         position.setLocation_z(z);
@@ -14,10 +20,6 @@ public class Keyboard {
         keyShape.setKey_height(height);
         keyShape.setKey_width(width);
     }
-
-    private int id;
-    public Position position=new Position();
-    public KeyShape keyShape=new KeyShape();
 
     public int getId() {
         return id;

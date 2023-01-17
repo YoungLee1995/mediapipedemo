@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.pm.ActivityInfo
 import android.graphics.Typeface
 import android.hardware.Camera
 import android.os.Build
@@ -21,7 +22,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.testdemo.bean.ScreenPixelSize
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
+import com.example.testdemo.utils.CameraInputTest
 import com.example.testdemo.utils.ResUIUtils
+import com.google.gson.Gson
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     // 实时相机演示UI和相机组件。
-    private lateinit var cameraInput: CameraInput
+    private lateinit var cameraInput: CameraInputTest
     private var glSurfaceView: SolutionGlSurfaceView<HandsResult>? = null
     private var hands: Hands? = null
     private val TAG = "MainActivity"
@@ -58,7 +61,9 @@ class MainActivity : AppCompatActivity() {
     private val handsView = mutableListOf<HandGestureView>()
     private var pixelWidth:Int = 0
     private var pixelHeight:Int = 0
+    private var widthSize = 0f
     private var screenSize :ScreenPixelSize?=null
+    private val textList = mutableListOf("1","2","3","4","5","6","7","8","9","清除","0","退格")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -93,17 +98,21 @@ class MainActivity : AppCompatActivity() {
         }*/
         keyContent.setLength(0)
         keyboard = TestKeyBoard()
-        keyboard.Init()
+        screenSize?.let {
+            keyboard.Init(it.screenWidth.toDouble(),it.screenHeight.toDouble())
+        }
+
         //动态绘制键盘View
         binding.keyboardLayout.removeAllViewsInLayout()
         keyBoardViewMap.clear()
+        Log.v("123View数据",Gson().toJson(keyboard.testKeyMap))
         for ((key,keyboard) in keyboard.testKeyMap){
             val textView = TextView(this)
             textView.x = (keyboard.position.pixel_x).toFloat()
             textView.y = (keyboard.position.pixel_y).toFloat()
             val params = FrameLayout.LayoutParams(keyboard.keyShape.key_width.toInt(), keyboard.keyShape.key_height.toInt())
             textView.layoutParams = params
-            textView.text = "$key"
+            textView.text = textList[key]
             textView.gravity = Gravity.CENTER
             textView.textSize = 20f
             textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
@@ -115,13 +124,13 @@ class MainActivity : AppCompatActivity() {
         }
         binding.keyboardLayout.requestLayout()
 
-        binding.btnOpen.setOnClickListener {
+        /*binding.btnOpen.setOnClickListener {
             keyContent.setLength(0)
             binding.keyboardContent.text = keyContent.toString()
             //把当前选中的View重置回去
             recoverySelectView()
             selectView = null
-        }
+        }*/
 
         /*binding.keyboardLayout.post {
             pixelWidth = binding.keyboardLayout.width
@@ -217,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
         // 初始化新的CameraInput实例并将其连接到MediaPipe Hands Solution。
-        cameraInput = CameraInput(this)
+        cameraInput = CameraInputTest(this)
         cameraInput.setNewFrameListener { textureFrame: TextureFrame? ->
             hands?.send(
                 textureFrame
@@ -247,22 +256,22 @@ class MainActivity : AppCompatActivity() {
             glSurfaceView?.requestRender()
         }
 
-        //连接gl曲面视图后可运行以启动相机。
-        glSurfaceView?.post(Runnable { this.startCamera() })
-
         // 更新预览布局。
         val frameLayout = findViewById<FrameLayout>(R.id.preview_display_layout)
         frameLayout.removeAllViewsInLayout()
         frameLayout.addView(glSurfaceView)
         glSurfaceView?.visibility = View.VISIBLE
         frameLayout.requestLayout()
+
+        //连接gl曲面视图后可运行以启动相机。
+        glSurfaceView?.post(Runnable { this.startCamera() })
     }
 
     private fun startCamera() {
         cameraInput.start(
             this,
             hands!!.glContext,
-            CameraInput.CameraFacing.BACK,
+            CameraInputTest.CameraFacing.BACK,
             glSurfaceView!!.width,
             glSurfaceView!!.height
         )
@@ -316,17 +325,20 @@ class MainActivity : AppCompatActivity() {
             if(binding.flHandSpot.visibility == View.GONE){
                 binding.flHandSpot.visibility = View.VISIBLE
             }
-            //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
-            val widthSize = (pixelHeight*(3.0/4.0)).toFloat()
-            Log.v("多少","$pixelHeight===$widthSize===${screenSize?.screenWidth}")
+            val frameSize = cameraInput.cameraHelper.frameSize
+
+            if(frameSize.width<frameSize.height){
+                //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
+                widthSize = (pixelHeight*(4.0/3.0)).toFloat()
+            }else{
+                widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+            }
+
             for ((index,item) in normalizedLandmark.withIndex()){
                 //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即23
-                val pixelX = (item.x*widthSize-(widthSize-screenSize?.screenWidth!!)/2.0)-23.0
+                val pixelX = (item.x*widthSize-(widthSize-pixelWidth)/2.0)-23.0
                 val pixelY = item.y*pixelHeight-23
                 val view = handsView[index]
-                if(index==0){
-                    Log.v("多少","$pixelX")
-                }
                 view.x = pixelX.toFloat()
                 view.y = pixelY
             }
@@ -334,98 +346,106 @@ class MainActivity : AppCompatActivity() {
 
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        val hand= normalizedLandmark[HandLandmark.WRIST]
-        L.v("${hand.x}-----${hand.y}")
-        val handMark = HandMark.lm2hm(landmark, normalizedLandmark)
-
+        /*val hand= normalizedLandmark[HandLandmark.WRIST]
+        L.v("${hand.x}-----${hand.y}")*/
+        val handMark = HandMark.lm2hm(widthSize.toInt(),pixelWidth,pixelHeight,landmark, normalizedLandmark)
         //判断是否满足120帧
         if (optimizedMarks.aveOptMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
             val position = handMark.jointPoint[8]
-            val intKeyId= FingerDetect.pushedKey(position)
-            val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
+            val intKeyId= FingerDetect.pushedKey(keyboard,position)
+            val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard,position,intKeyId)
             optimizedMarks.pushback(handMark,intKeyId,false,false,isFingerOnKey)
         } else {
             //满足120帧  先删除第一针
             val position = optimizedMarks.aveOptMarks.markList.last.jointPoint[8]
-            val intKeyId= FingerDetect.pushedKey(position)
-            val isFingerOnKey = FingerDetect.isFingerOnKey(position,intKeyId)
+            val intKeyId= FingerDetect.pushedKey(keyboard,position)
+            val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard,position,intKeyId)
             optimizedMarks.popfront()
             optimizedMarks.pushback(handMark,intKeyId,false,false,isFingerOnKey)
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
             if(isKeyPushed){
-                //L.v("当前出发的ID=========${keyboard.testKeyMap[intKeyId]?.id}")
-                if(keyContent.isEmpty()){
-                    keyContent.append(keyboard.testKeyMap[intKeyId]?.id)
-                }else{
-                    keyContent.append(",${keyboard.testKeyMap[intKeyId]?.id}")
-                }
-                binding.keyboardContent.post {
-                    keyBoardViewMap[intKeyId]?.let { keyView->
-                        if(selectView!=null){
-                            //重置之前的View为原始状态
-                            recoverySelectView()
-                        }
-                        //设置选中的View效果
-                        selectView = keyView
-                        keyView.setBackgroundResource(R.drawable.keyboard_btn_press_bg)
-                        if(animation!=null){
-                            //取消之前沒有完成的动画
-                            animation?.cancel()
-                        }
-                        val objectAnimationX = ObjectAnimator.ofFloat(keyView, "scaleX", 1f,0.9f)
-                        val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
-                        animation = AnimatorSet()
-                        animation?.play(objectAnimationX)?.with(objectAnimationY)
-                        animation?.duration = 200
-                        animation?.addListener(object :AnimatorListener{
-
-                            override fun onAnimationStart(animation: Animator) {
+                if(intKeyId<textList.size){
+                    if(intKeyId==9){
+                        //清空操作
+                        keyContent.setLength(0)
+                    }else if(intKeyId==11){
+                        //退格操作
+                        if(keyContent.isNotEmpty()){
+                            if(keyContent.length==1){
+                                //不包含
+                                keyContent.deleteCharAt(keyContent.length-1)
+                            }else{
+                                //包含
+                                keyContent.deleteCharAt(keyContent.length-2)
+                                keyContent.deleteCharAt(keyContent.length-1)
                             }
+                        }
+                    }else{
+                        if(keyContent.isEmpty()){
+                            keyContent.append(textList[intKeyId])
+                        }else{
+                            keyContent.append(",${textList[intKeyId]}")
+                        }
+                    }
 
-                            override fun onAnimationEnd(animation: Animator) {
-                                lifecycleScope.coroutineContext.cancelChildren()
-                                lifecycleScope.launch {
-                                    flow<Boolean> {
-                                        delay(1.seconds)
-                                        emit(true)
-                                    }.collect{
-                                        //取消缩放效果 恢复原始状态
-                                        recoverySelectView()
-                                        selectView = null
+                    binding.keyboardContent.post {
+                        keyBoardViewMap[intKeyId]?.let { keyView->
+                            if(selectView!=null){
+                                //重置之前的View为原始状态
+                                recoverySelectView()
+                            }
+                            //设置选中的View效果
+                            selectView = keyView
+                            keyView.setBackgroundResource(R.drawable.keyboard_btn_press_bg)
+                            if(animation!=null){
+                                //取消之前沒有完成的动画
+                                animation?.cancel()
+                            }
+                            val objectAnimationX = ObjectAnimator.ofFloat(keyView, "scaleX", 1f,0.9f)
+                            val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
+                            animation = AnimatorSet()
+                            animation?.play(objectAnimationX)?.with(objectAnimationY)
+                            animation?.duration = 200
+                            animation?.addListener(object :AnimatorListener{
+
+                                override fun onAnimationStart(animation: Animator) {
+                                }
+
+                                override fun onAnimationEnd(animation: Animator) {
+                                    lifecycleScope.coroutineContext.cancelChildren()
+                                    lifecycleScope.launch {
+                                        flow<Boolean> {
+                                            delay(1.seconds)
+                                            emit(true)
+                                        }.collect{
+                                            //取消缩放效果 恢复原始状态
+                                            recoverySelectView()
+                                            selectView = null
+                                        }
                                     }
                                 }
-                            }
 
-                            override fun onAnimationCancel(animation: Animator) {
-                            }
+                                override fun onAnimationCancel(animation: Animator) {
+                                }
 
-                            override fun onAnimationRepeat(animation: Animator) {
-                            }
+                                override fun onAnimationRepeat(animation: Animator) {
+                                }
 
-                        })
-                        animation?.start()
+                            })
+                            animation?.start()
+                        }
+                        binding.keyboardContent.text = keyContent.toString()
+                        /*if(intKeyId==9){
+                            //清空操作
+                            //把当前选中的View重置回去
+                            recoverySelectView()
+                            selectView = null
+                        }*/
                     }
-                    binding.keyboardContent.text = keyContent.toString()
                 }
             }
         }
-
-        /*val wristWorldLandmark =
-            result.multiHandWorldLandmarks()[0].landmarkList[HandLandmark.INDEX_FINGER_TIP]
-*/
-        /*L.v(
-            String.format(
-                "WorldLandmarks-------INDEX_FINGER_TIP: z=%f m", wristWorldLandmark.z
-            )
-        )*/
-        /*Log.i(
-            TAG, String.format(
-                "MediaPipe Hand wrist world coordinates (in meters with the origin at the hand's"
-                        + " approximate geometric center): x=%f m, y=%f m, z=%f m",
-                wristWorldLandmark.x, wristWorldLandmark.y, wristWorldLandmark.z
-            )
-        )*/
     }
     private fun recoverySelectView(){
         selectView?.let {
@@ -439,70 +459,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var mPreviewScale:Float= 0f
-    private var mPreviewWidth:Int = 0
-    private var mPreviewHeight:Int = 0
-    fun find_camera_resolution() {
-        val mCamera: Camera = Camera.open()
-        val params: Camera.Parameters = mCamera.getParameters()
-        val vSizes : List<Camera.Size> = params.getSupportedPreviewSizes()
-
-        //获取和屏幕比列相近的 一个尺寸
-        val previewSize: Camera.Size = getSuitableSize(vSizes)
-//重新定义 宽和高 （宽始终小于高）
-        //重新定义 宽和高 （宽始终小于高）
-        val previewWidth = Math.min(previewSize.width, previewSize.height)
-        val previewHeight = Math.max(previewSize.width, previewSize.height)
-
-        //获取 最终 我们需要预览的大小比列
-        mPreviewScale = previewWidth * 1f / previewHeight;
-        //算出 最终 宽高
-        if (mPreviewWidth > previewWidth)
-            mPreviewHeight = (mPreviewWidth / mPreviewScale).toInt()
-        else if (mPreviewWidth < previewWidth)
-            mPreviewHeight = (mPreviewHeight * mPreviewScale).toInt()
-
-
-
-        Log.v("多少","$mPreviewWidth-----$mPreviewHeight")
-        //parameters.setPreviewSize(mPreviewWidth, mPreviewHeight); // 设置预览图像大小
-
-
-        //val widths = IntArray(params.getSupportedPreviewSizes().size)
-        //val heights = IntArray(params.getSupportedPictureSizes().size)
-        //var mSize: Camera.Size?
-        /*for (size in sizes) {
-            *//*Toast.makeText(
-                this,
-                "Available resolution:" + widths.size + "" + size.height,
-                Toast.LENGTH_LONG
-            ).show()
-            mSize = size*//*
-            Log.v("多少","宽：${size.width}====高：${size.height}")
-        }*/
-    }
-
-    private fun getSuitableSize(sizes : List<Camera.Size>):Camera.Size{
-        var minDelta = Int.MAX_VALUE // 最小的差值，初始值应该设置大点保证之后的计算中会被重置
-        var index = 0 // 最小的差值对应的索引坐标
-        for (i in 0 until sizes.size){
-            val previewSize = sizes[i]
-            Log.v(
-                TAG,
-                "SupportedPreviewSize, width: " + previewSize.width.toString() + ", height: " + previewSize.height
-            )
-            // 找到一个与设置的分辨率差值最小的相机支持的分辨率大小
-            if ((previewSize.width * mPreviewScale).toInt() === previewSize.height){
-                val delta: Int = Math.abs(mPreviewWidth - previewSize.width)
-                if (delta == 0) {
-                    return previewSize
-                }
-                if (minDelta > delta){
-                    minDelta = delta
-                    index = i
-                }
-            }
-        }
-        return sizes[index] // 默认返回与设置的分辨率最接近的预览尺寸
-    }
 }
