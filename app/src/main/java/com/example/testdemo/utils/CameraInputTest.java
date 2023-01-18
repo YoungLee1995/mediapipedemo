@@ -21,7 +21,7 @@ public class CameraInputTest {
     private CameraHelper.OnCameraStartedListener customOnCameraStartedListener;
     private TextureFrameConsumer newFrameListener;
     private SurfaceTexture frameTexture;
-    private ExternalTextureConverter converter;
+    private CustomExternalTextureConverter converter;
 
     public CameraInputTest(Activity activity) {
         PermissionHelper.checkAndRequestCameraPermissions(activity);
@@ -38,7 +38,8 @@ public class CameraInputTest {
     public void start(Activity activity, EGLContext eglContext, CameraFacing cameraFacing, int width, int height) {
         if (PermissionHelper.cameraPermissionsGranted(activity)) {
             if (this.converter == null) {
-                this.converter = new ExternalTextureConverter(eglContext, 2);
+                this.converter = new CustomExternalTextureConverter(eglContext, 2,270);
+                this.converter.setFlipY(false);
             }
 
             if (this.newFrameListener == null) {

@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity() {
         cameraInput.start(
             this,
             hands!!.glContext,
-            CameraInputTest.CameraFacing.BACK,
+            CameraInputTest.CameraFacing.FRONT,
             glSurfaceView!!.width,
             glSurfaceView!!.height
         )
@@ -325,15 +325,15 @@ class MainActivity : AppCompatActivity() {
             if(binding.flHandSpot.visibility == View.GONE){
                 binding.flHandSpot.visibility = View.VISIBLE
             }
-            val frameSize = cameraInput.cameraHelper.frameSize
-
-            if(frameSize.width<frameSize.height){
-                //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
-                widthSize = (pixelHeight*(4.0/3.0)).toFloat()
-            }else{
-                widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+            if(widthSize!=0f){
+                val frameSize = cameraInput.cameraHelper.frameSize
+                if(frameSize.width<frameSize.height){
+                    //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
+                    widthSize = (pixelHeight*(4.0/3.0)).toFloat()
+                }else{
+                    widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+                }
             }
-
             for ((index,item) in normalizedLandmark.withIndex()){
                 //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即23
                 val pixelX = (item.x*widthSize-(widthSize-pixelWidth)/2.0)-23.0

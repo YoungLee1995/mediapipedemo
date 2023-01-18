@@ -24,7 +24,6 @@ public class MyCameraFilter implements CameraFilter {
         while (cameraIterator.hasNext()) {
             camera = cameraIterator.next();
             @SuppressLint("RestrictedApi") String getImplementationType = camera.getCameraInfo().getImplementationType();
-            Log.v("多少", getImplementationType);
         }
         LinkedHashSet linkedHashSet = new LinkedHashSet<>();
         linkedHashSet.add(camera); // 最后一个camera
