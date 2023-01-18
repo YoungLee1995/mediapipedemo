@@ -352,21 +352,21 @@ class MainActivity : AppCompatActivity() {
             }
             if(widthSize==0f){
                 val frameSize = cameraInput.cameraHelper.frameSize
-                if(frameSize.width<frameSize.height){
+                if(frameSize.width<frameSize.height||!cameraInput.isCameraRotated){
                     //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
-                    widthSize = (pixelHeight*(4.0/3.0)).toFloat()
+                    widthSize = (pixelHeight*(pixelWidth.toDouble()/pixelHeight.toDouble())).toFloat()
                     //3:4  得到图像原始高度
-                    //heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
+                    heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
                 }else{
-                    widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+                    widthSize = (pixelHeight*(pixelHeight.toDouble()/pixelWidth.toDouble())).toFloat()
                     //4:3  得到图像原始高度
-                    //heightSize = (widthSize*frameSize.width.toDouble()/frameSize.height.toDouble()).toFloat()
+                    heightSize = (widthSize*frameSize.width.toDouble()/frameSize.height.toDouble()).toFloat()
                 }
             }
             for ((index,item) in normalizedLandmark.withIndex()){
                 //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即13
                 val pixelX = (item.x*widthSize-(widthSize-pixelWidth)/2.0)-13.0
-                val pixelY = (item.y*pixelHeight)-13.0
+                val pixelY = (item.y*heightSize-(heightSize-pixelHeight)/2.0)-13.0
                 val view = handsView[index]
                 view.x = pixelX.toFloat()
                 view.y = pixelY.toFloat()
