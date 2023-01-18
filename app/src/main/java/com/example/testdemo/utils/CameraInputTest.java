@@ -21,7 +21,7 @@ public class CameraInputTest {
     private CameraHelper.OnCameraStartedListener customOnCameraStartedListener;
     private TextureFrameConsumer newFrameListener;
     private SurfaceTexture frameTexture;
-    private CustomExternalTextureConverter converter;
+    private ExternalTextureConverter converter;
 
     public CameraInputTest(Activity activity) {
         PermissionHelper.checkAndRequestCameraPermissions(activity);
@@ -38,7 +38,7 @@ public class CameraInputTest {
     public void start(Activity activity, EGLContext eglContext, CameraFacing cameraFacing, int width, int height) {
         if (PermissionHelper.cameraPermissionsGranted(activity)) {
             if (this.converter == null) {
-                this.converter = new CustomExternalTextureConverter(eglContext, 2,270);
+                this.converter = new ExternalTextureConverter(eglContext, 2);
                 this.converter.setFlipY(false);
             }
 
@@ -65,7 +65,7 @@ public class CameraInputTest {
     public void updateOutputSize(int width, int height) {
         Size displaySize = this.cameraHelper.computeDisplaySizeFromViewSize(new Size(width, height));
         boolean isCameraRotated = this.cameraHelper.isCameraRotated();
-        Log.i("CameraInput", "Set camera output texture frame size to width=" + displaySize.getWidth() + " , height=" + displaySize.getHeight());
+        Log.i("CameraInput", isCameraRotated+"123Set camera output texture frame size to width=" + displaySize.getWidth() + " , height=" + displaySize.getHeight());
         this.converter.setDestinationSize(isCameraRotated ? displaySize.getHeight() : displaySize.getWidth(), isCameraRotated ? displaySize.getWidth() : displaySize.getHeight());
     }
 

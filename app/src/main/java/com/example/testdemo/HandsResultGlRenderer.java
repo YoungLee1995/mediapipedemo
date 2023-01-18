@@ -86,13 +86,13 @@ public class HandsResultGlRenderer implements ResultGlRenderer<HandsResult> {
     GLES20.glUniformMatrix4fv(projectionMatrixHandle, 1, false, projectionMatrix, 0);
     GLES20.glLineWidth(CONNECTION_THICKNESS);
 
-    int numHands = result.multiHandLandmarks().size();
+    /*int numHands = result.multiHandLandmarks().size();
     for (int i = 0; i < numHands; ++i) {
       boolean isLeftHand = result.multiHandedness().get(i).getLabel().equals("Left");
       drawConnections(
           result.multiHandLandmarks().get(i).getLandmarkList(),
           isLeftHand ? LEFT_HAND_CONNECTION_COLOR : RIGHT_HAND_CONNECTION_COLOR);
-      /*for (NormalizedLandmark landmark : result.multiHandLandmarks().get(i).getLandmarkList()) {
+      for (NormalizedLandmark landmark : result.multiHandLandmarks().get(i).getLandmarkList()) {
         // Draws the landmark.
         drawCircle(
             landmark.getX(),
@@ -103,8 +103,8 @@ public class HandsResultGlRenderer implements ResultGlRenderer<HandsResult> {
             landmark.getX(),
             landmark.getY(),
             isLeftHand ? LEFT_HAND_HOLLOW_CIRCLE_COLOR : RIGHT_HAND_HOLLOW_CIRCLE_COLOR);
-      }*/
-    }
+      }
+    }*/
   }
 
   /**

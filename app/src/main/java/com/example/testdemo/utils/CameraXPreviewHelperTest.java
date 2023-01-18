@@ -116,8 +116,8 @@ public class CameraXPreviewHelperTest extends CameraHelper {
             }
 
             this.preview = (new androidx.camera.core.Preview.Builder()).setTargetResolution(rotatedSize).build();
-            //CameraSelector cameraSelector = cameraFacing == CameraFacing.FRONT ? CameraSelector.DEFAULT_FRONT_CAMERA : CameraSelector.DEFAULT_BACK_CAMERA;
-            CameraSelector cameraSelector = new CameraSelector.Builder().addCameraFilter(new MyCameraFilter()).build(); // 选择最后一个camera
+            CameraSelector cameraSelector = cameraFacing == CameraFacing.FRONT ? CameraSelector.DEFAULT_FRONT_CAMERA : CameraSelector.DEFAULT_BACK_CAMERA;
+            //CameraSelector cameraSelector = new CameraSelector.Builder().addCameraFilter(new MyCameraFilter()).build(); // 选择最后一个camera
             this.preview.setSurfaceProvider(this.renderExecutor, (request) -> {
                 this.frameSize = request.getResolution();
                 Log.d("CameraXPreviewHelper", String.format("Received surface request for resolution %dx%d", this.frameSize.getWidth(), this.frameSize.getHeight()));

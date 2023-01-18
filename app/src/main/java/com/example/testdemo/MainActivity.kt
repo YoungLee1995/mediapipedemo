@@ -38,6 +38,7 @@ import com.hjq.permissions.XXPermissions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.lang.Runnable
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private var pixelWidth:Int = 0
     private var pixelHeight:Int = 0
     private var widthSize = 0f
+    private var heightSize = 0f
     private var screenSize :ScreenPixelSize?=null
     private val textList = mutableListOf("1","2","3","4","5","6","7","8","9","清除","0","退格")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +107,6 @@ class MainActivity : AppCompatActivity() {
         //动态绘制键盘View
         binding.keyboardLayout.removeAllViewsInLayout()
         keyBoardViewMap.clear()
-        Log.v("123View数据",Gson().toJson(keyboard.testKeyMap))
         for ((key,keyboard) in keyboard.testKeyMap){
             val textView = TextView(this)
             textView.x = (keyboard.position.pixel_x).toFloat()
@@ -118,6 +119,30 @@ class MainActivity : AppCompatActivity() {
             textView.typeface = Typeface.defaultFromStyle(Typeface.BOLD)
             textView.setTextColor(ContextCompat.getColor(this, R.color.white))
             textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
+
+            if(textList[key]=="清除"){
+                textView.setOnClickListener {
+                    keyContent.setLength(0)
+                    setTextViewAnimation(textView)
+                    binding.keyboardContent.text = keyContent.toString()
+                }
+            }else if(textList[key]=="退格"){
+                textView.setOnClickListener {
+                    //退格操作
+                    if(keyContent.isNotEmpty()){
+                        if(keyContent.length==1){
+                            //不包含
+                            keyContent.deleteCharAt(keyContent.length-1)
+                        }else{
+                            //包含
+                            keyContent.deleteCharAt(keyContent.length-2)
+                            keyContent.deleteCharAt(keyContent.length-1)
+                        }
+                    }
+                    setTextViewAnimation(textView)
+                    binding.keyboardContent.text = keyContent.toString()
+                }
+            }
             binding.keyboardLayout.addView(textView)
             //把按钮的View对象存储起来
             keyBoardViewMap[key] = textView
@@ -271,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         cameraInput.start(
             this,
             hands!!.glContext,
-            CameraInputTest.CameraFacing.FRONT,
+            CameraInputTest.CameraFacing.BACK,
             glSurfaceView!!.width,
             glSurfaceView!!.height
         )
@@ -325,22 +350,26 @@ class MainActivity : AppCompatActivity() {
             if(binding.flHandSpot.visibility == View.GONE){
                 binding.flHandSpot.visibility = View.VISIBLE
             }
-            if(widthSize!=0f){
+            if(widthSize==0f){
                 val frameSize = cameraInput.cameraHelper.frameSize
                 if(frameSize.width<frameSize.height){
                     //因为输出的图像宽高比是4:3的  所以需要按照高度转换一下得到图像原始宽度
                     widthSize = (pixelHeight*(4.0/3.0)).toFloat()
+                    //3:4  得到图像原始高度
+                    //heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
                 }else{
                     widthSize = (pixelHeight*(3.0/4.0)).toFloat()
+                    //4:3  得到图像原始高度
+                    //heightSize = (widthSize*frameSize.width.toDouble()/frameSize.height.toDouble()).toFloat()
                 }
             }
             for ((index,item) in normalizedLandmark.withIndex()){
-                //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即23
-                val pixelX = (item.x*widthSize-(widthSize-pixelWidth)/2.0)-23.0
-                val pixelY = item.y*pixelHeight-23
+                //原始宽度减去手机屏幕宽度再除以2  得到左右多出多少间距  再减去自定义圆点的半径  即13
+                val pixelX = (item.x*widthSize-(widthSize-pixelWidth)/2.0)-13.0
+                val pixelY = (item.y*pixelHeight)-13.0
                 val view = handsView[index]
                 view.x = pixelX.toFloat()
-                view.y = pixelY
+                view.y = pixelY.toFloat()
             }
         }
 
@@ -391,49 +420,7 @@ class MainActivity : AppCompatActivity() {
 
                     binding.keyboardContent.post {
                         keyBoardViewMap[intKeyId]?.let { keyView->
-                            if(selectView!=null){
-                                //重置之前的View为原始状态
-                                recoverySelectView()
-                            }
-                            //设置选中的View效果
-                            selectView = keyView
-                            keyView.setBackgroundResource(R.drawable.keyboard_btn_press_bg)
-                            if(animation!=null){
-                                //取消之前沒有完成的动画
-                                animation?.cancel()
-                            }
-                            val objectAnimationX = ObjectAnimator.ofFloat(keyView, "scaleX", 1f,0.9f)
-                            val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
-                            animation = AnimatorSet()
-                            animation?.play(objectAnimationX)?.with(objectAnimationY)
-                            animation?.duration = 200
-                            animation?.addListener(object :AnimatorListener{
-
-                                override fun onAnimationStart(animation: Animator) {
-                                }
-
-                                override fun onAnimationEnd(animation: Animator) {
-                                    lifecycleScope.coroutineContext.cancelChildren()
-                                    lifecycleScope.launch {
-                                        flow<Boolean> {
-                                            delay(1.seconds)
-                                            emit(true)
-                                        }.collect{
-                                            //取消缩放效果 恢复原始状态
-                                            recoverySelectView()
-                                            selectView = null
-                                        }
-                                    }
-                                }
-
-                                override fun onAnimationCancel(animation: Animator) {
-                                }
-
-                                override fun onAnimationRepeat(animation: Animator) {
-                                }
-
-                            })
-                            animation?.start()
+                            setTextViewAnimation(keyView)
                         }
                         binding.keyboardContent.text = keyContent.toString()
                         /*if(intKeyId==9){
@@ -446,6 +433,55 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * 设置View点击动画
+     */
+    private fun setTextViewAnimation(keyView:TextView){
+        if(selectView!=null){
+            //重置之前的View为原始状态
+            recoverySelectView()
+        }
+        //设置选中的View效果
+        selectView = keyView
+        keyView.setBackgroundResource(R.drawable.keyboard_btn_press_bg)
+        if(animation!=null){
+            //取消之前沒有完成的动画
+            animation?.cancel()
+        }
+        val objectAnimationX = ObjectAnimator.ofFloat(keyView, "scaleX", 1f,0.9f)
+        val objectAnimationY = ObjectAnimator.ofFloat(keyView, "scaleY", 1f,0.9f)
+        animation = AnimatorSet()
+        animation?.play(objectAnimationX)?.with(objectAnimationY)
+        animation?.duration = 100
+        animation?.addListener(object :AnimatorListener{
+
+            override fun onAnimationStart(animation: Animator) {
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                lifecycleScope.coroutineContext.cancelChildren()
+                lifecycleScope.launch {
+                    flow<Boolean> {
+                        delay(100.milliseconds)
+                        emit(true)
+                    }.collect{
+                        //取消缩放效果 恢复原始状态
+                        recoverySelectView()
+                        selectView = null
+                    }
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+            }
+
+        })
+        animation?.start()
     }
     private fun recoverySelectView(){
         selectView?.let {

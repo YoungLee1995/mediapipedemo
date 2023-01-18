@@ -62,7 +62,7 @@ public class CustomExternalTextureRenderer {
         surfaceTexture.updateTexImage();
         surfaceTexture.getTransformMatrix(this.textureTransformMatrix);
 
-        Log.v("多少1111",flipY+"----"+rotation);
+        //Log.v("多少1111",flipY+"----"+rotation);
         //ADD
         switch (rotation) {
             case 0:

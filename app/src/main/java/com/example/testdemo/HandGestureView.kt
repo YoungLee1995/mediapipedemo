@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat
 class HandGestureView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null)  : View(context,attrs) {
     private var framePaint: Paint = Paint()
     private var circlePaint: Paint = Paint()
-    private var startX:Float = 25f
-    private var startY:Float = 25f
+    private var startX:Float = 15f
+    private var startY:Float = 15f
     init{
         //初始化画笔
         //抗锯齿
@@ -50,8 +50,8 @@ class HandGestureView @JvmOverloads constructor(context: Context, attrs: Attribu
     override fun onDraw(canvas: Canvas?) {
         super.dispatchDraw(canvas)
         //画边框
-        canvas?.drawCircle(startX,startY,23f,framePaint)
+        canvas?.drawCircle(startX,startY,13f,framePaint)
         //画内圆
-        canvas?.drawCircle(startX,startY,20f,circlePaint)
+        canvas?.drawCircle(startX,startY,10f,circlePaint)
     }
 }
