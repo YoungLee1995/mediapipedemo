@@ -377,7 +377,7 @@ class MainActivity : AppCompatActivity() {
         //坐标转换成handMark
         /*val hand= normalizedLandmark[HandLandmark.WRIST]
         L.v("${hand.x}-----${hand.y}")*/
-        val handMark = HandMark.lm2hm(widthSize.toInt(),pixelWidth,pixelHeight,landmark, normalizedLandmark)
+        val handMark = HandMark.lm2hm(widthSize.toInt(),pixelWidth,heightSize.toInt(),pixelHeight,landmark, normalizedLandmark)
         //判断是否满足120帧
         if (optimizedMarks.aveOptMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
