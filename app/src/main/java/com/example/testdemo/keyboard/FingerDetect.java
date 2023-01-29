@@ -65,7 +65,7 @@ public class FingerDetect {
         int totalSign=0;
         for(int i=1;i<signList.length;i++){
             int num=i*10;
-            if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num).jointPoint[8].getLocation_z()>2.5){
+            if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num).jointPoint[8].getLocation_z()>4.5){
                 signList[i]=true;
             }
             if(handMarks.historyMoveSign.get(num)){

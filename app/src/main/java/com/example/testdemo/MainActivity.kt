@@ -70,11 +70,13 @@ class MainActivity : AppCompatActivity() {
     private var heightSize = 0f
     private var screenSize :ScreenPixelSize?=null
     private val textList = mutableListOf("1","2","3","4","5","6","7","8","9","清除","0","退格")
+    private var index = -1L
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         screenSize = ResUIUtils.getScreenPixelSize(this)
+        index = -1L
         initView()
         ///启动功能
         initData()
@@ -218,6 +220,7 @@ class MainActivity : AppCompatActivity() {
 
     /**设置带有摄像头输入的实时演示的UI组件*/
     private fun setupLiveDemoUiComponents() {
+        LogcatUtils.newInstance().writeTxtToFile(",predictionTime,frameCount,worldLandmark-X,worldLandmark-Y,worldLandmark-Z,landmark-X,landmark-Y,landmark-Z")
         //清除数据
         //stopCurrentPipeline()
         //启动摄像头输入功能
@@ -307,7 +310,7 @@ class MainActivity : AppCompatActivity() {
     }
     val handMarks = HandMarks()
     val optimizedMarks = OptimizedMarks()
-    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")//设置日期格式精确到毫秒 SSS代表毫秒
+    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")//设置日期格式精确到毫秒 SSS代表毫秒
     private fun logWristLandmark(result: HandsResult, showPixelValues: Boolean) {
         /*if (result.multiHandLandmarks().isEmpty()) {
             return
@@ -331,6 +334,10 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }*/
+        binding.tvCurrentTime.post {
+            val date= df.format(Date())// new Date()为获取当前系统时间
+            binding.tvCurrentTime.text = date
+        }
         if (result.multiHandWorldLandmarks().isEmpty()||result.multiHandLandmarks().isEmpty()) {
             binding.flHandSpot.post{
                 binding.flHandSpot.visibility = View.GONE
@@ -345,14 +352,15 @@ class MainActivity : AppCompatActivity() {
         //获取像素坐标
         val normalizedLandmark = result.multiHandLandmarks()[0].landmarkList
 
-        val date= df.format(Date())// new Date()为获取当前系统时间
-        LogcatUtils.newInstance().writeTxtToFile("$date  worldLandmarks-Z:${landmark[HandLandmark.INDEX_FINGER_TIP].z}----landmarks-X:${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].x}----landmarks-Y:${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].y}")
         if(landmark.isEmpty()&&normalizedLandmark.isEmpty()){
             binding.flHandSpot.post{
                 binding.flHandSpot.visibility = View.GONE
             }
             return
         }
+        //val date= df.format(Date())// new Date()为获取当前系统时间
+        index += 1
+        LogcatUtils.newInstance().writeTxtToFile("$index,${Date().time},$index,${landmark[HandLandmark.INDEX_FINGER_TIP].x},${landmark[HandLandmark.INDEX_FINGER_TIP].y},${landmark[HandLandmark.INDEX_FINGER_TIP].z},${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].x},${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].y},${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].z}")
         binding.flHandSpot.post {
             if(binding.flHandSpot.visibility == View.GONE){
                 binding.flHandSpot.visibility = View.VISIBLE
@@ -501,5 +509,4 @@ class MainActivity : AppCompatActivity() {
             animationSet.start()
         }
     }
-
 }

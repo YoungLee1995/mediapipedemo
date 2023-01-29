@@ -28,6 +28,12 @@ public class LogcatUtils {
         }else{
             filePath = Environment.getExternalStorageDirectory().getPath() + "/";
         }
+        File file = new File(filePath + fileName);
+        if (file.exists()) {
+            //如果当前初始化的时候存在该文件  那就删除掉之后重新创建
+            Boolean isDeleteSuccess = file.delete();
+            Log.v("LogcatUtils","文件是否删除成功:"+isDeleteSuccess);
+        }
         Log.v("LogcatUtils",filePath);
     }
 

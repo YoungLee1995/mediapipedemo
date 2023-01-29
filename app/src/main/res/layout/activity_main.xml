@@ -53,10 +53,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:layout_margin="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:textColor="@color/white"
                 android:background="@drawable/button_bg"/>
 
+        <TextView
+                android:id="@+id/tv_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:background="@drawable/keyboard_btn_bg"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
         <!--<Button
                 android:id="@+id/btn_open"
                 android:layout_width="wrap_content"
