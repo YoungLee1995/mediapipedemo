@@ -23,6 +23,7 @@ import com.example.testdemo.bean.ScreenPixelSize
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
 import com.example.testdemo.utils.CameraInputTest
+import com.example.testdemo.utils.LogcatUtils
 import com.example.testdemo.utils.ResUIUtils
 import com.google.gson.Gson
 import com.google.mediapipe.framework.TextureFrame
@@ -38,6 +39,9 @@ import com.hjq.permissions.XXPermissions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import java.lang.Runnable
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -303,6 +307,7 @@ class MainActivity : AppCompatActivity() {
     }
     val handMarks = HandMarks()
     val optimizedMarks = OptimizedMarks()
+    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")//设置日期格式精确到毫秒 SSS代表毫秒
     private fun logWristLandmark(result: HandsResult, showPixelValues: Boolean) {
         /*if (result.multiHandLandmarks().isEmpty()) {
             return
@@ -340,6 +345,8 @@ class MainActivity : AppCompatActivity() {
         //获取像素坐标
         val normalizedLandmark = result.multiHandLandmarks()[0].landmarkList
 
+        val date= df.format(Date())// new Date()为获取当前系统时间
+        LogcatUtils.newInstance().writeTxtToFile("$date  worldLandmarks-Z:${landmark[HandLandmark.INDEX_FINGER_TIP].z}----landmarks-X:${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].x}----landmarks-Y:${normalizedLandmark[HandLandmark.INDEX_FINGER_TIP].y}")
         if(landmark.isEmpty()&&normalizedLandmark.isEmpty()){
             binding.flHandSpot.post{
                 binding.flHandSpot.visibility = View.GONE

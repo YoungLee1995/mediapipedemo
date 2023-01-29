@@ -1,6 +1,7 @@
 package com.example.testdemo
 
 import androidx.multidex.MultiDexApplication
+import com.example.testdemo.utils.LogcatUtils
 import com.example.testdemo.utils.ResUIUtils
 
 /**
@@ -16,5 +17,6 @@ class TestApp : MultiDexApplication() {
         instance = this
         ResUIUtils.init(instance)
         L.setDebug(true)
+        LogcatUtils.newInstance().init(this)
     }
 }
