@@ -22,8 +22,8 @@ public class TestKeyBoard {
     }
 
     public void Init(double width,double height){
-        double keyWidth=width/4-25;
-        double keyHeight=height/4-25;
+        double keyWidth=width/4-40;
+        double keyHeight=keyWidth;
         double y_first=0.0;
         double x_first=20.0;
         double z=300.0;
