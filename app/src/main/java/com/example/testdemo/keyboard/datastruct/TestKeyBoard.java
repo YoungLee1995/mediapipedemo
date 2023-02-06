@@ -1,8 +1,6 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.datastruct;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
+import com.example.testdemo.keyboard.datastruct.Keyboard;
 
 import java.util.HashMap;
 import java.util.Map;

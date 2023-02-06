@@ -1,4 +1,8 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.datastruct;
+
+import com.example.testdemo.keyboard.datastruct.HandMark;
+import com.example.testdemo.keyboard.datastruct.HandMarks;
+import com.example.testdemo.keyboard.math.MoveAverage;
 
 public class OptimizedMarks {
     public OptimizedMarks() {
@@ -6,7 +10,7 @@ public class OptimizedMarks {
     public OptimizedMarks(HandMarks originMarks) {
         this.originMarks = originMarks;
 
-        HandMark h0=MoveAverage.calc2Average(originMarks.markList.getFirst(),originMarks.markList.get(1));
+        HandMark h0= MoveAverage.calc2Average(originMarks.markList.getFirst(),originMarks.markList.get(1));
         this.aveOptMarks.pushback(originMarks.markList.getFirst(),originMarks.historyKey.getFirst(),originMarks.historyMoveSign.getFirst(),
                 originMarks.historyPushSign.getFirst(),originMarks.historyFOnKSign.getFirst());
         this.aveOptMarks.pushback(h0,originMarks.historyMoveSign.get(1),false,false);

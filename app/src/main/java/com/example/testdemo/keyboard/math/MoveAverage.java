@@ -1,4 +1,6 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.math;
+
+import com.example.testdemo.keyboard.datastruct.HandMark;
 
 public class MoveAverage {
     public static Coordinate calc2Average(Coordinate p1,Coordinate p2){
@@ -19,7 +21,7 @@ public class MoveAverage {
         p.setCartesian_y((p1.getCartesian_y()+p2.getCartesian_y()+p3.getCartesian_y()+p4.getCartesian_y())/4);
         return p;
     }
-    public static HandMark calc2Average(HandMark h1,HandMark h2){
+    public static HandMark calc2Average(HandMark h1, HandMark h2){
         HandMark h=new HandMark();
         for(int i=0;i<h1.jointPoint.length;i++){
             h.jointPoint[i].setPixel_x((h1.jointPoint[i].getPixel_x()+h2.jointPoint[i].getPixel_x())/2);

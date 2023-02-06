@@ -1,4 +1,6 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.datastruct;
+
+import com.example.testdemo.keyboard.datastruct.HandMark;
 
 import java.util.LinkedList;
 
@@ -8,15 +10,10 @@ public class HandMarks {
     public LinkedList<Boolean> historyPushSign =new LinkedList<>();
     public LinkedList<Boolean> historyFOnKSign =new LinkedList<>();
     public LinkedList<Integer> historyKey =new LinkedList<>();
-    private int ID;
+    public LinkedList<Double> gratitude2lastp=new LinkedList<>();
+    public LinkedList<Double> gratitude2last5p=new LinkedList<>(); //使用最小二乘法得到当前5帧的线性拟合后的梯度
 
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
+    public int ID;
 
     public void pushback(HandMark h){
         this.markList.add(h);

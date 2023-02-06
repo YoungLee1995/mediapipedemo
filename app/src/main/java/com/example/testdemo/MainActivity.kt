@@ -21,7 +21,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.testdemo.bean.ScreenPixelSize
 import com.example.testdemo.databinding.ActivityMainBinding
-import com.example.testdemo.keyboard.*
+import com.example.testdemo.keyboard.datastruct.HandMark
+import com.example.testdemo.keyboard.datastruct.HandMarks
+import com.example.testdemo.keyboard.datastruct.OptimizedMarks
+import com.example.testdemo.keyboard.datastruct.TestKeyBoard
+import com.example.testdemo.keyboard.taprules.FingerDetect
 import com.example.testdemo.utils.CameraInputTest
 import com.example.testdemo.utils.DecimalUtil
 import com.example.testdemo.utils.log.LogcatUtils
@@ -345,7 +349,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     val handMarks = HandMarks()
-    val optimizedMarks = OptimizedMarks()
+    val optimizedMarks =
+        OptimizedMarks()
     val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")//设置日期格式精确到毫秒 SSS代表毫秒
     private fun logWristLandmark(result: HandsResult, showPixelValues: Boolean) {
         /*if (result.multiHandLandmarks().isEmpty()) {
@@ -427,13 +432,11 @@ class MainActivity : AppCompatActivity() {
 
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        /*val hand= normalizedLandmark[HandLandmark.WRIST]
-        L.v("${hand.x}-----${hand.y}")*/
-        val handMark = HandMark.lm2hm(widthSize.toInt(),pixelWidth,heightSize.toInt(),pixelHeight,landmark, normalizedLandmark)
-/*=======
+        val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
+        L.v("当前z-${hand.z}")
         val handMark =
-            HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark)
->>>>>>> b117aba (修改按钮数量)*/
+            HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
+                System.currentTimeMillis())
         //判断是否满足120帧
         if (optimizedMarks.aveOptMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据

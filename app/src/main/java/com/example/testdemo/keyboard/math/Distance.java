@@ -1,7 +1,9 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.math;
+
+import com.example.testdemo.keyboard.datastruct.Position;
 
 public class Distance {
-    public static double pixelDistance(Position p1,Position p2){
+    public static double pixelDistance(Position p1, Position p2){
         double dx=p1.getPixel_x()-p2.getPixel_x();
         double dy=p1.getPixel_y()-p2.getPixel_y();
         double d=Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));

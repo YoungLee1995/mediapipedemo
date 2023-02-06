@@ -1,13 +1,15 @@
-package com.example.testdemo.keyboard;
+package com.example.testdemo.keyboard.taprules;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
+import com.example.testdemo.keyboard.datastruct.HandMarks;
+import com.example.testdemo.keyboard.datastruct.KeyShape;
+import com.example.testdemo.keyboard.datastruct.Position;
+import com.example.testdemo.keyboard.datastruct.TestKeyBoard;
+import com.example.testdemo.keyboard.math.Distance;
 
 import java.util.Objects;
 
 public class FingerDetect {
-    public static int pushedKey(TestKeyBoard testKeyBoard,Position finger1_position){
+    public static int pushedKey(TestKeyBoard testKeyBoard, Position finger1_position){
         double distance=Double.MAX_VALUE;
         int id=0;
         Position newKeyCenter = new Position();
@@ -20,7 +22,7 @@ public class FingerDetect {
             double height=keyShape.getKey_height();
             newKeyCenter.setPixel_x(x+width/2.0);
             newKeyCenter.setPixel_y(y+height/2.0);
-            double d=Distance.pixelDistance(finger1_position, newKeyCenter);
+            double d= Distance.pixelDistance(finger1_position, newKeyCenter);
             if(d<distance){
                 id= Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getId();
                 //Log.v("距离id",d+":"+newKeyCenter.getPixel_x());
