@@ -1,8 +1,9 @@
 package com.example.testdemo
 
 import androidx.multidex.MultiDexApplication
-import com.example.testdemo.utils.LogcatUtils
+import com.example.testdemo.utils.log.LogcatUtils
 import com.example.testdemo.utils.ResUIUtils
+import com.example.testdemo.utils.log.L
 
 /**
  * App启动入口

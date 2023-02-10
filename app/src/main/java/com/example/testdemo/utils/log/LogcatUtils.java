@@ -1,4 +1,4 @@
-package com.example.testdemo.utils;
+package com.example.testdemo.utils.log;
 
 import android.content.Context;
 import android.os.Build;

@@ -22,18 +22,26 @@ public class TestKeyBoard {
     }
 
     public void Init(double width,double height){
-        double keyWidth=width/4-40;
-        double keyHeight=keyWidth;
-        double y_first=0.0;
+        //行数
+        int lineNum=4;
+        //列数
+        int columnNUm=4;
+        //宽高比
+        double ratio=width/height;
+        double keyWidth=width/columnNUm-20;
+        double keyHeight=height*ratio/lineNum-20;
+        double y_first=10.0;
         double x_first=20.0;
         double z=300.0;
         int id=0;
+
+        double y_top = (height-(keyHeight*lineNum+y_first*lineNum))/2;
         testKeyMap = new HashMap<>();
-        for(int i = 0;i<3;i++)
+        for(int i = 0;i<lineNum;i++)
         {
-            for (int j = 0; j < 4; j++) {
-                double x = x_first+j*(keyWidth+20);
-                double y = y_first + i * (keyHeight+20);
+            for (int j = 0; j < columnNUm; j++) {
+                double x = x_first+j*(keyWidth+10);
+                double y=y_first + i * (keyHeight+10)+y_top;
                 Keyboard k = new Keyboard(x, y, z, keyWidth, keyHeight, z);
                 k.setId(id);
                 testKeyMap.put(id, k);

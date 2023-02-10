@@ -19,12 +19,21 @@
             android:text="相机链接失败" />
     </FrameLayout>
 
+    <TextView
+            android:id="@+id/tv_calculation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:padding="10dp"
+            android:gravity="right|bottom"
+            android:text="0"
+            android:textSize="24sp"/>
+
     <FrameLayout
         android:id="@+id/keyboard_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"/>
 
-    </FrameLayout>
     <FrameLayout
             android:id="@+id/fl_hand_spot"
             android:layout_width="match_parent"
@@ -57,6 +66,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:textColor="@color/white"
+                android:visibility="gone"
                 android:background="@drawable/button_bg"/>
 
         <TextView
@@ -80,7 +90,7 @@
                 android:layout_gravity="center"/>-->
     </LinearLayout>
 
-    <!--<com.example.testdemo.HandGestureView
+    <!--<com.example.testdemo.weight.HandGestureView
             android:id="@+id/hand_gesture"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>-->

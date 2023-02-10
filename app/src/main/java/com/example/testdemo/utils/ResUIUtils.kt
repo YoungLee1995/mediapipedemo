@@ -340,4 +340,18 @@ object ResUIUtils {
         return ScreenPixelSize( point.x, point.y)
     }
 
+
+    /**
+     * 使用java正则表达式去掉多余的.与0
+     * @param s
+     * @return
+     */
+    fun subZeroAndDot(s: String): String {
+        var s = s
+        if (s.indexOf(".") > 0) {
+            s = s.replace("0+?$".toRegex(), "") //去掉多余的0
+            s = s.replace("[.]$".toRegex(), "") //如最后一位是.则去掉
+        }
+        return s
+    }
 }

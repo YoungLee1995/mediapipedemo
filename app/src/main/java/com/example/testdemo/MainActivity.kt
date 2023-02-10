@@ -4,14 +4,14 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.pm.ActivityInfo
 import android.graphics.Typeface
-import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup.LayoutParams
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -23,11 +23,12 @@ import com.example.testdemo.bean.ScreenPixelSize
 import com.example.testdemo.databinding.ActivityMainBinding
 import com.example.testdemo.keyboard.*
 import com.example.testdemo.utils.CameraInputTest
-import com.example.testdemo.utils.LogcatUtils
+import com.example.testdemo.utils.DecimalUtil
+import com.example.testdemo.utils.log.LogcatUtils
 import com.example.testdemo.utils.ResUIUtils
-import com.google.gson.Gson
+import com.example.testdemo.utils.log.L
+import com.example.testdemo.weight.HandGestureView
 import com.google.mediapipe.framework.TextureFrame
-import com.google.mediapipe.solutioncore.CameraInput
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
 import com.google.mediapipe.solutions.hands.HandLandmark
 import com.google.mediapipe.solutions.hands.Hands
@@ -36,14 +37,14 @@ import com.google.mediapipe.solutions.hands.HandsResult
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import kotlinx.coroutines.*
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
-import java.lang.Runnable
+import kotlinx.coroutines.launch
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -70,10 +71,10 @@ class MainActivity : AppCompatActivity() {
     private var heightSize = 0f
     private var screenSize: ScreenPixelSize? = null
     private val textList = mutableListOf(
-        "1", "2", "3", "+",
+        "7", "8", "9", "+",
         "4", "5", "6", "-",
-        "7", "8", "9", "*",
-        "0", "=", "清除", "/"
+        "1", "2", "3", "*",
+        "清除", "0", "=", "/"
     )
     private var index = -1L
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,6 +135,28 @@ class MainActivity : AppCompatActivity() {
             textView.setTextColor(ContextCompat.getColor(this, R.color.white))
             textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
 
+            if (key == 0) {
+                //第一个元素
+                binding.tvCalculation.viewTreeObserver.addOnGlobalLayoutListener(object :
+                    OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        if (Build.VERSION.SDK_INT >= 16) {
+                            binding.tvCalculation.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        } else {
+                            binding.tvCalculation.viewTreeObserver.removeGlobalOnLayoutListener(this)
+                        }
+                        val marginTop =
+                            keyboard.position.pixel_y.toInt()
+                        val params = FrameLayout.LayoutParams(
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.WRAP_CONTENT
+                        )
+                        params.height = marginTop
+                        binding.tvCalculation.layoutParams = params
+                        //ResUIUtils.setMargins(binding.tvCalculation, 0, marginTop, 0, 0)
+                    }
+                })
+            }
             if (textList[key] == "清除") {
                 textView.setOnClickListener {
                     keyContent.setLength(0)
@@ -428,7 +451,8 @@ class MainActivity : AppCompatActivity() {
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
             if (isKeyPushed) {
                 if (intKeyId < textList.size) {
-                    if (intKeyId == 9) {
+                    setIntKeyHandle(intKeyId)
+                    /*if (intKeyId == 9) {
                         //清空操作
                         keyContent.setLength(0)
                     } else if (intKeyId == 11) {
@@ -456,13 +480,13 @@ class MainActivity : AppCompatActivity() {
                             setTextViewAnimation(keyView)
                         }
                         binding.keyboardContent.text = keyContent.toString()
-                        /*if(intKeyId==9){
+                        *//*if(intKeyId==9){
                             //清空操作
                             //把当前选中的View重置回去
                             recoverySelectView()
                             selectView = null
-                        }*/
-                    }
+                        }*//*
+                    }*/
                 }
             }
         }
@@ -527,5 +551,142 @@ class MainActivity : AppCompatActivity() {
             animationSet.duration = 200
             animationSet.start()
         }
+    }
+
+    // 第一个操作数
+    private var firstNum = ""
+    // 运算符
+    private var operator = ""
+    // 第二个操作数
+    private var secondNum = ""
+    // 当前的计算结果
+    private var result = ""
+    // 显示的文本内容
+    private var showText = StringBuffer()
+    private fun setIntKeyHandle(intKyeId: Int) {
+        binding.tvCalculation.post {
+            val inputText = textList[intKyeId]
+            when (intKyeId) {
+                12 -> {
+                    //清除操作
+                    clear()
+                    binding.tvCalculation.text = "0"
+                }
+                3, 7, 11, 15 -> {
+                    //加减乘除运算符
+                    if(TextUtils.isEmpty(firstNum)){
+                        //如果第一个操作数是空的情况下  不能输入运算符
+                        Toast.makeText(this, "请输入数字", Toast.LENGTH_SHORT).show()
+                        return@post
+                    }
+                    if (!TextUtils.isEmpty(operator)&&!TextUtils.isEmpty(secondNum)){
+                        //如果运算符不等于空并且第二个操作数也不为空的话  就先进行一次运算   运算的结果作为第一个数据
+                        val calculateResult = ResUIUtils.subZeroAndDot(calculateFour())
+                        refreshOperate(calculateResult)
+                        showText.setLength(0)
+                        showText.append(firstNum)
+                    }
+                    //可能出现点击了多次运算符的情况  取最后一次
+                    if (result.isNotEmpty()) {
+                        //之前有过运算结果了
+                        showText.setLength(0)
+                        showText.append(firstNum)
+                    }
+                    if (!TextUtils.isEmpty(operator) && showText.last().toString() == operator) {
+                        operator = inputText // 运算符
+                        showText.deleteCharAt(showText.length - 1)
+                        showText.append(operator)
+                    } else {
+                        operator = inputText // 运算符
+                        showText.append(operator)
+                    }
+                    refreshText()
+                }
+                14 -> {
+                    //等号
+                    if (operator.isEmpty()) { // 无运算符
+                        Toast.makeText(this, "请输入运算符", Toast.LENGTH_SHORT).show()
+                        return@post
+                    }
+                    if (firstNum.isEmpty() || secondNum.isEmpty()) { // 无操作数
+                        Toast.makeText(this, "请输入数字", Toast.LENGTH_SHORT).show()
+                        return@post
+                    }
+                    if (operator == "/" && secondNum == "0") { // 除数为零
+                        Toast.makeText(this, "除数不能为零", Toast.LENGTH_SHORT).show()
+                        return@post
+                    }
+                    val calculateResult = ResUIUtils.subZeroAndDot(calculateFour())
+                    refreshOperate(calculateResult)
+                    showText.append("=$result")
+                    refreshText()
+                }
+                else -> {
+                    //数字符号
+                    // 上次的运算结果已经出来了
+                    if (result.isNotEmpty() && operator.isEmpty()) {
+                        clear()
+                    }
+                    // 无运算符，则继续拼接第一个操作数
+                    if (operator.isEmpty()) {
+                        firstNum = "$firstNum$inputText"
+                    } else {
+                        // 有运算符，则继续拼接第二个操作数
+                        if (secondNum == "0") {
+                            secondNum = ""
+                        }
+                        secondNum = "$secondNum$inputText"
+                    }
+                    // 整数不需要前面的0
+                    if (showText.toString() == "0" && inputText != ".") {
+                        showText.setLength(0)
+                        showText.append(inputText)
+                        refreshText()
+                    } else {
+                        showText.append(inputText)
+                        refreshText()
+                    }
+                }
+            }
+            keyBoardViewMap[intKyeId]?.let { keyView ->
+                //设置点击效果
+                setTextViewAnimation(keyView)
+            }
+        }
+    }
+
+    // 加减乘除四则运算，返回计算结果
+    private fun calculateFour(): String {
+        return when (operator) {
+            "+" -> DecimalUtil.add(firstNum, secondNum)
+            "-" -> DecimalUtil.subtract(firstNum, secondNum)
+            "*" -> DecimalUtil.multiply(firstNum, secondNum)
+            else -> DecimalUtil.divideWithRoundingModeAndScale(
+                firstNum,
+                secondNum,
+                RoundingMode.UP,
+                2
+            )
+        }
+    }
+
+    // 清空并初始化
+    private fun clear() {
+        refreshOperate("")
+        showText.setLength(0)
+        refreshText()
+    }
+
+    // 刷新运算结果
+    private fun refreshOperate(newResult: String) {
+        result = newResult
+        firstNum = result
+        secondNum = ""
+        operator = ""
+    }
+
+    // 刷新文本显示
+    private fun refreshText() {
+        binding.tvCalculation.text = showText
     }
 }

@@ -1,4 +1,4 @@
-package com.example.testdemo
+package com.example.testdemo.weight
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.example.testdemo.R
 
 class HandGestureView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null)  : View(context,attrs) {
     private var framePaint: Paint = Paint()
@@ -17,7 +18,7 @@ class HandGestureView @JvmOverloads constructor(context: Context, attrs: Attribu
         //抗锯齿
         framePaint.isAntiAlias = true
         //设置颜色
-        framePaint.color = ContextCompat.getColor(context,R.color.purple_500)
+        framePaint.color = ContextCompat.getColor(context, R.color.purple_500)
         //样式  描边
         framePaint.style = Paint.Style.STROKE
         framePaint.strokeWidth = 6f
@@ -25,7 +26,7 @@ class HandGestureView @JvmOverloads constructor(context: Context, attrs: Attribu
         //抗锯齿
         circlePaint.isAntiAlias = true
         //设置颜色
-        circlePaint.color = ContextCompat.getColor(context,R.color.red)
+        circlePaint.color = ContextCompat.getColor(context, R.color.red)
         //样式  描边
         circlePaint.style = Paint.Style.FILL
     }

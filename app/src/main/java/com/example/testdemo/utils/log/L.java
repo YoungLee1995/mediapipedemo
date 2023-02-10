@@ -1,4 +1,4 @@
-package com.example.testdemo;
+package com.example.testdemo.utils.log;
 
 import android.util.Log;
 
