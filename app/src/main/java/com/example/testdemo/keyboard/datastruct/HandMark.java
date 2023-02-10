@@ -1,25 +1,11 @@
 package com.example.testdemo.keyboard.datastruct;
 
+import com.example.testdemo.keyboard.headers.Enums;
 import com.google.mediapipe.formats.proto.LandmarkProto;
 
 import java.util.List;
 
-enum GratitudeTag {
-    FLAT(1),
-    RISING(2),
-    DESCENDING(3);
 
-
-    private int code;
-    private GratitudeTag(int code){
-        this.code = code;
-    }
-
-    public int getCode(){
-        return code;
-    }
-
-}
 
 public class HandMark {
     public HandMark() {
@@ -35,10 +21,10 @@ public class HandMark {
     public boolean historyMoveSign =false;
     public boolean historyPushSign =false;
     public boolean historyFOnKSign =false;
-    public int historyKey =0;
+    public int historyKey =99999;
     public double gratitude2lastp=0.0;
     public double gratitude2last5p=0.0; //使用最小二乘法得到当前5帧的线性拟合后的梯度
-    public GratitudeTag gratitudeTag= GratitudeTag.FLAT;
+    public Enums.GratitudeTag gratitudeTag= Enums.GratitudeTag.FLAT;
 
     //将landmark转换为handmark
     public static HandMark lm2hm(int width,int pixelWidth,

@@ -25,6 +25,8 @@ import com.example.testdemo.keyboard.datastruct.HandMark
 import com.example.testdemo.keyboard.datastruct.HandMarks
 import com.example.testdemo.keyboard.datastruct.OptimizedMarks
 import com.example.testdemo.keyboard.datastruct.TestKeyBoard
+import com.example.testdemo.keyboard.headers.Enums
+import com.example.testdemo.keyboard.math.GratitudeCalc
 import com.example.testdemo.keyboard.taprules.FingerDetect
 import com.example.testdemo.utils.CameraInputTest
 import com.example.testdemo.utils.DecimalUtil
@@ -438,21 +440,27 @@ class MainActivity : AppCompatActivity() {
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
                 System.currentTimeMillis())
         //判断是否满足120帧
-        if (optimizedMarks.aveOptMarks.markList.size < 120) {
+        if (optimizedMarks.originMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
             val position = handMark.jointPoint[8]
             val intKeyId = FingerDetect.pushedKey(keyboard, position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
-            optimizedMarks.pushback(handMark, intKeyId, false, false, isFingerOnKey)
+            handMark.ID=intKeyId;
+            handMark.historyFOnKSign=isFingerOnKey;
+            optimizedMarks.pushback(handMark)
         } else {
             //满足120帧  先删除第一针
-            val position = optimizedMarks.aveOptMarks.markList.last.jointPoint[8]
+            val position = optimizedMarks.originMarks.markList.last.jointPoint[8]
             val intKeyId = FingerDetect.pushedKey(keyboard, position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             optimizedMarks.popfront()
-            optimizedMarks.pushback(handMark, intKeyId, false, false, isFingerOnKey)
-            val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.aveOptMarks)
-            if (isKeyPushed) {
+            handMark.ID=intKeyId;
+            handMark.historyFOnKSign=isFingerOnKey;
+            GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
+            optimizedMarks.pushback(handMark)
+            val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.originMarks)
+            if (isKeyPushed&&optimizedMarks.originMarks.outputPermitTag) {
+                optimizedMarks.originMarks.outputPermitTag=false;
                 if (intKeyId < textList.size) {
                     setIntKeyHandle(intKeyId)
                     /*if (intKeyId == 9) {
@@ -490,6 +498,18 @@ class MainActivity : AppCompatActivity() {
                             selectView = null
                         }*//*
                     }*/
+                }
+            }
+            else
+            {
+                if(!optimizedMarks.originMarks.outputPermitTag){
+                    optimizedMarks.originMarks.lastOutputFrame++
+                }
+                if(optimizedMarks.originMarks.markList.last.gratitudeTag== Enums.GratitudeTag.DESCENDING&&
+                    optimizedMarks.originMarks.markList.get(optimizedMarks.originMarks.markList.size-2).gratitudeTag
+                    == Enums.GratitudeTag.DESCENDING||optimizedMarks.originMarks.lastOutputFrame>29){
+                    optimizedMarks.originMarks.outputPermitTag=true
+                    optimizedMarks.originMarks.lastOutputFrame=0
                 }
             }
         }

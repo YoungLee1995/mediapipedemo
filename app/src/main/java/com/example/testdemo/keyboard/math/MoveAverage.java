@@ -23,6 +23,7 @@ public class MoveAverage {
     }
     public static HandMark calc2Average(HandMark h1, HandMark h2){
         HandMark h=new HandMark();
+        //h的各类标记还没有定义
         for(int i=0;i<h1.jointPoint.length;i++){
             h.jointPoint[i].setPixel_x((h1.jointPoint[i].getPixel_x()+h2.jointPoint[i].getPixel_x())/2);
             h.jointPoint[i].setPixel_y((h1.jointPoint[i].getPixel_y()+h2.jointPoint[i].getPixel_y())/2);

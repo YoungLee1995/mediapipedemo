@@ -4,6 +4,7 @@ import com.example.testdemo.keyboard.datastruct.HandMarks;
 import com.example.testdemo.keyboard.datastruct.KeyShape;
 import com.example.testdemo.keyboard.datastruct.Position;
 import com.example.testdemo.keyboard.datastruct.TestKeyBoard;
+import com.example.testdemo.keyboard.headers.Enums;
 import com.example.testdemo.keyboard.math.Distance;
 
 import java.util.Objects;
@@ -51,15 +52,15 @@ public class FingerDetect {
         int totalSign=0;
         int hmSize=handMarks.markList.size();
         if(hmSize<119) return false;
-        //统计近40帧手指是否都位于当前帧所在按键内
+        //统计近20帧手指是否都位于当前帧所在按键内
         for(int i=0;i<20;i++){
             int num=hmSize-20+i;
-            if(handMarks.historyKey.get(i)==handMarks.historyKey.getLast()&&handMarks.historyFOnKSign.get(i)){
-                hmSize++;
+            if(handMarks.markList.get(num).historyKey==handMarks.markList.getLast().historyKey&&handMarks.markList.get(i).historyFOnKSign){
+                totalSign++;
             }
         }
 
-        return hmSize>15&&handMarks.historyFOnKSign.getLast();
+        return totalSign>15&&handMarks.markList.getLast().historyMoveSign;
     }
 
     public static boolean isKeyPushed(HandMarks handMarks){
@@ -70,9 +71,9 @@ public class FingerDetect {
             if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num).jointPoint[8].getLocation_z()>4.5){
                 signList[i]=true;
             }
-            if(handMarks.historyMoveSign.get(num)){
+            if(handMarks.markList.get(num).historyMoveSign){
                 int index=0;
-                while(num+index<signList.length&&handMarks.historyMoveSign.get(num+index)){
+                while(num+index<signList.length&&handMarks.markList.get(num+index).historyMoveSign){
                     index++;
                 }
                 if(handMarks.markList.getLast().jointPoint[8].getLocation_z()-handMarks.markList.get(num+index).jointPoint[8].getLocation_z()>-0.5){
@@ -86,14 +87,13 @@ public class FingerDetect {
             }
         }
         if(totalSign/10.0>0.7){
-            handMarks.historyMoveSign.removeLast();
-            handMarks.historyMoveSign.addLast(true);
+            handMarks.markList.getLast().historyMoveSign=true;
         }
         boolean isFingerOnKey=FingerDetect.isFingerOnKey(handMarks);
-        boolean isKeyPushed=handMarks.historyMoveSign.getLast() && !handMarks.historyMoveSign.get(handMarks.historyMoveSign.size() - 2)&&isFingerOnKey;
+        boolean isKeyPushed=handMarks.markList.getLast().historyMoveSign && !handMarks.markList.get(handMarks.markList.size() - 2).historyMoveSign&&isFingerOnKey
+                &&(handMarks.markList.getLast().gratitudeTag== Enums.GratitudeTag.RISING)&&(handMarks.markList.get(handMarks.markList.size() - 2).gratitudeTag== Enums.GratitudeTag.RISING);
         if(isKeyPushed){
-            handMarks.historyPushSign.removeLast();
-            handMarks.historyPushSign.addLast(true);
+            handMarks.markList.getLast().historyPushSign=true;
         }
 
         return isKeyPushed;
