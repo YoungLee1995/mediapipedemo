@@ -434,11 +434,11 @@ class MainActivity : AppCompatActivity() {
 
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
-        L.v("当前z-${hand.z}")
+        //val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
+        //L.v("${hand.z}")
         val handMark =
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
-                System.currentTimeMillis())
+            System.currentTimeMillis())
         //判断是否满足120帧
         if (optimizedMarks.originMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
@@ -459,6 +459,7 @@ class MainActivity : AppCompatActivity() {
             GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
             optimizedMarks.pushback(handMark)
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.originMarks)
+            L.v("${optimizedMarks.originMarks.outputPermitTag}")
             if (isKeyPushed&&optimizedMarks.originMarks.outputPermitTag) {
                 optimizedMarks.originMarks.outputPermitTag=false;
                 if (intKeyId < textList.size) {
