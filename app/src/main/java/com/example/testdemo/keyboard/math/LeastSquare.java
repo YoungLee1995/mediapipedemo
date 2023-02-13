@@ -3,7 +3,7 @@ package com.example.testdemo.keyboard.math;
 import java.util.LinkedList;
 
 public class LeastSquare {
-    public static double LeastSquareA(LinkedList<Double> x,LinkedList<Double> y)
+    public static double LeastSquareA(LinkedList<Long> x,LinkedList<Double> y)
     {
         double sigmaxy=0.0;
         double sigmax=0.0;

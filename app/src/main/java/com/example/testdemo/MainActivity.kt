@@ -418,6 +418,13 @@ class MainActivity : AppCompatActivity() {
                     heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
                 }else{
                     widthSize = (pixelHeight*(pixelHeight.toDouble()/pixelWidth.toDouble())).toFloat()
+/*=======
+                    widthSize = (pixelHeight * (frameSize.width / frameSize.height)).toFloat()
+                    //3:4  得到图像原始高度
+                    //heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
+                } else {
+                    widthSize = (pixelHeight * (frameSize.height / frameSize.width)).toFloat()
+>>>>>>> 7a08b6b (完善单指计算器算法点击功能)*/
                     //4:3  得到图像原始高度
                     heightSize = (widthSize*frameSize.width.toDouble()/frameSize.height.toDouble()).toFloat()
                 }
@@ -434,8 +441,8 @@ class MainActivity : AppCompatActivity() {
 
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        //val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
-        //L.v("${hand.z}")
+        val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
+        L.v("当前z-${hand.z}")
         val handMark =
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
             System.currentTimeMillis())
@@ -456,10 +463,9 @@ class MainActivity : AppCompatActivity() {
             optimizedMarks.popfront()
             handMark.ID=intKeyId;
             handMark.historyFOnKSign=isFingerOnKey;
-            GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
             optimizedMarks.pushback(handMark)
+            GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.originMarks)
-            L.v("${optimizedMarks.originMarks.outputPermitTag}")
             if (isKeyPushed&&optimizedMarks.originMarks.outputPermitTag) {
                 optimizedMarks.originMarks.outputPermitTag=false;
                 if (intKeyId < textList.size) {

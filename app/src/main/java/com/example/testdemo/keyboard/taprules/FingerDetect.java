@@ -1,5 +1,7 @@
 package com.example.testdemo.keyboard.taprules;
 
+import android.util.Log;
+
 import com.example.testdemo.keyboard.datastruct.HandMarks;
 import com.example.testdemo.keyboard.datastruct.KeyShape;
 import com.example.testdemo.keyboard.datastruct.Position;
@@ -89,9 +91,9 @@ public class FingerDetect {
         if(totalSign/10.0>0.7){
             handMarks.markList.getLast().historyMoveSign=true;
         }
-        boolean isFingerOnKey=FingerDetect.isFingerOnKey(handMarks);
-        boolean isKeyPushed=handMarks.markList.getLast().historyMoveSign && !handMarks.markList.get(handMarks.markList.size() - 2).historyMoveSign&&isFingerOnKey
-                &&(handMarks.markList.getLast().gratitudeTag== Enums.GratitudeTag.RISING)&&(handMarks.markList.get(handMarks.markList.size() - 2).gratitudeTag== Enums.GratitudeTag.RISING);
+        //boolean isFingerOnKey=FingerDetect.isFingerOnKey(handMarks);
+        boolean isKeyPushed=(handMarks.markList.getLast().gratitudeTag== Enums.GratitudeTag.RISING);//handMarks.markList.getLast().historyMoveSign && !handMarks.markList.get(handMarks.markList.size() - 2).historyMoveSig&&&&isFingerOnKey
+        //&&(handMarks.markList.get(handMarks.markList.size() - 2).gratitudeTag== Enums.GratitudeTag.RISING)
         if(isKeyPushed){
             handMarks.markList.getLast().historyPushSign=true;
         }

@@ -1,6 +1,9 @@
 package com.example.testdemo.keyboard.math;
 
 import static com.example.testdemo.keyboard.headers.ConstPredefinedKt.doubleZero;
+
+import android.util.Log;
+
 import com.example.testdemo.keyboard.datastruct.HandMark;
 import com.example.testdemo.keyboard.datastruct.HandMarks;
 import com.example.testdemo.keyboard.headers.Enums;
@@ -25,7 +28,7 @@ public class GratitudeCalc {
         if(pointId>20||pointId<0){
             return 0.0;
         }
-        LinkedList<Double> timeStamps=new LinkedList<>();
+        LinkedList<Long> timeStamps=new LinkedList<>();
         LinkedList<Double> deepthOfPoint=new LinkedList<>();
         int HMsize=h.markList.size();
         for(int i=0;i<n;i++){
@@ -39,32 +42,32 @@ public class GratitudeCalc {
     //不仅要返回梯度tag，还应该将HandMarks里面对应的梯度值修改为计算得到的梯度值。单位mm/ms
     public static Enums.GratitudeTag gratitudeTagCalc(HandMarks h, int pointId){
         Enums.GratitudeTag result=Enums.GratitudeTag.FLAT;
-        double criticalG=10.0/33.0;
-        h.markList.getLast().gratitude2lastp=GratitudeCalc.gratitudeOfNframe(h,pointId,2);
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,2)>criticalG){
+        double criticalG=5.0/57.0;
+        h.markList.getLast().gratitude2lastp=GratitudeCalc.gratitudeOf2frame(h.markList.get(h.markList.size()-2),h.markList.getLast(),pointId);
+        if(h.markList.getLast().gratitude2lastp>criticalG){
             result=Enums.GratitudeTag.RISING;
         }
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,3)>criticalG){
-            result=Enums.GratitudeTag.RISING;
-            h.markList.get(h.markList.size()-2).gratitudeTag=result;
-        }
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,4)>criticalG){
-            result=Enums.GratitudeTag.RISING;
-            h.markList.get(h.markList.size()-2).gratitudeTag=result;
-            h.markList.get(h.markList.size()-3).gratitudeTag=result;
-        }
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,2)<-1*criticalG){
+//        if(GratitudeCalc.gratitudeOfNframe(h,pointId,3)>criticalG){
+//            result=Enums.GratitudeTag.RISING;
+//            h.markList.get(h.markList.size()-2).gratitudeTag=result;
+//        }
+//        if(GratitudeCalc.gratitudeOfNframe(h,pointId,4)>criticalG){
+//            result=Enums.GratitudeTag.RISING;
+//            h.markList.get(h.markList.size()-2).gratitudeTag=result;
+//            h.markList.get(h.markList.size()-3).gratitudeTag=result;
+//        }
+        if(h.markList.getLast().gratitude2lastp<-1*criticalG){
             result=Enums.GratitudeTag.DESCENDING;
         }
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,3)<-1*criticalG){
-            result=Enums.GratitudeTag.DESCENDING;
-            h.markList.get(h.markList.size()-2).gratitudeTag=result;
-        }
-        if(GratitudeCalc.gratitudeOfNframe(h,pointId,4)<-1*criticalG){
-            result=Enums.GratitudeTag.DESCENDING;
-            h.markList.get(h.markList.size()-2).gratitudeTag=result;
-            h.markList.get(h.markList.size()-3).gratitudeTag=result;
-        }
+//        if(GratitudeCalc.gratitudeOfNframe(h,pointId,3)<-1*criticalG){
+//            result=Enums.GratitudeTag.DESCENDING;
+//            h.markList.get(h.markList.size()-2).gratitudeTag=result;
+//        }
+//        if(GratitudeCalc.gratitudeOfNframe(h,pointId,4)<-1*criticalG){
+//            result=Enums.GratitudeTag.DESCENDING;
+//            h.markList.get(h.markList.size()-2).gratitudeTag=result;
+//            h.markList.get(h.markList.size()-3).gratitudeTag=result;
+//        }
         h.markList.getLast().gratitudeTag=result;
         return result;
     }

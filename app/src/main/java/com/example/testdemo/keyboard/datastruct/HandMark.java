@@ -17,7 +17,7 @@ public class HandMark {
 
     public Position[] jointPoint =new Position[21];
     public int ID;
-    public double timestamp=0.0;
+    public long timestamp=0;
     public boolean historyMoveSign =false;
     public boolean historyPushSign =false;
     public boolean historyFOnKSign =false;
