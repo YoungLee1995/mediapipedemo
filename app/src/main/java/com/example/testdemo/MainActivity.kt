@@ -141,8 +141,8 @@ class MainActivity : AppCompatActivity() {
             textView.setTextColor(ContextCompat.getColor(this, R.color.white))
             textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
 
-            if (key == 0) {
-                //第一个元素
+            if (key == 3) {
+                //第三个元素  也就是第一排的最后一个
                 binding.tvCalculation.viewTreeObserver.addOnGlobalLayoutListener(object :
                     OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
@@ -152,13 +152,18 @@ class MainActivity : AppCompatActivity() {
                             binding.tvCalculation.viewTreeObserver.removeGlobalOnLayoutListener(this)
                         }
                         val marginTop =
-                            keyboard.position.pixel_y.toInt()
+                            keyboard.position.pixel_y.toFloat()
                         val params = FrameLayout.LayoutParams(
                             LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT
                         )
-                        params.height = marginTop
+                        val screenWidth = screenSize?.screenWidth?:0
+                        val width = screenWidth-(keyboard.position.pixel_x.toInt()+keyboard.keyShape.key_width.toInt())
+                        //params.height = marginTop
+                        params.width =width
                         binding.tvCalculation.layoutParams = params
+                        binding.tvCalculation.x = (keyboard.position.pixel_x+keyboard.keyShape.key_width).toFloat()
+                        binding.tvCalculation.y = marginTop
                         //ResUIUtils.setMargins(binding.tvCalculation, 0, marginTop, 0, 0)
                     }
                 })

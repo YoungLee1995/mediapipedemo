@@ -39,7 +39,7 @@ public class TestKeyBoard {
         {
             for (int j = 0; j < columnNUm; j++) {
                 double x = x_first+j*(keyWidth+10);
-                double y=y_first + i * (keyHeight+10)+50;
+                double y=y_first + i * (keyHeight+10);
                 Keyboard k = new Keyboard(x, y, z, keyWidth, keyHeight, z);
                 k.setId(id);
                 testKeyMap.put(id, k);
