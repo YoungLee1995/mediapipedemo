@@ -26,20 +26,20 @@ public class TestKeyBoard {
         int columnNUm=4;
         //宽高比
         double ratio=width/height;
-        double keyWidth=width/columnNUm-20;
-        double keyHeight=height*ratio/lineNum-20;
+        double keyWidth=width/(columnNUm+2)-20;
+        double keyHeight=height/lineNum-20;
         double y_first=10.0;
         double x_first=20.0;
         double z=300.0;
         int id=0;
 
-        double y_top = (height-(keyHeight*lineNum+y_first*lineNum))/2;
+        //double y_top = (height-(keyHeight*lineNum+y_first*lineNum))/2;
         testKeyMap = new HashMap<>();
         for(int i = 0;i<lineNum;i++)
         {
             for (int j = 0; j < columnNUm; j++) {
                 double x = x_first+j*(keyWidth+10);
-                double y=y_first + i * (keyHeight+10)+y_top;
+                double y=y_first + i * (keyHeight+10)+50;
                 Keyboard k = new Keyboard(x, y, z, keyWidth, keyHeight, z);
                 k.setId(id);
                 testKeyMap.put(id, k);

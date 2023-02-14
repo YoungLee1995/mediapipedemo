@@ -42,7 +42,7 @@ public class GratitudeCalc {
     //不仅要返回梯度tag，还应该将HandMarks里面对应的梯度值修改为计算得到的梯度值。单位mm/ms
     public static Enums.GratitudeTag gratitudeTagCalc(HandMarks h, int pointId){
         Enums.GratitudeTag result=Enums.GratitudeTag.FLAT;
-        double criticalG=5.0/57.0;
+        double criticalG=10.0/57.0;
         h.markList.getLast().gratitude2lastp=GratitudeCalc.gratitudeOf2frame(h.markList.get(h.markList.size()-2),h.markList.getLast(),pointId);
         if(h.markList.getLast().gratitude2lastp>criticalG){
             result=Enums.GratitudeTag.RISING;
