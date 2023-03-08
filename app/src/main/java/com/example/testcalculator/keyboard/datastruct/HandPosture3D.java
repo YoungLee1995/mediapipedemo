@@ -1,16 +1,12 @@
-package com.example.testcalculator.keyboard.parameters;
+package com.example.testcalculator.keyboard.datastruct;
 
-import com.example.testcalculator.keyboard.datastruct.HandMark;
-import com.example.testcalculator.keyboard.datastruct.Position;
 import com.example.testcalculator.keyboard.math.Vector3D;
 
-import java.lang.reflect.Array;
-
-public class HandPosture {
+public class HandPosture3D {
     final double pi = 3.141592654;
-    public HandPosture() {
+    public HandPosture3D() {
     }
-    public HandPosture(HandMark handMark) {
+    public HandPosture3D(HandMark handMark) {
         //init joint vectors
         for(int i=0;i<21;i++){
             jointPoint[i].setLocation_x(handMark.jointPoint[i].getLocation_x());
@@ -19,7 +15,6 @@ public class HandPosture {
             jointPoint[i].setPixel_x(handMark.jointPoint[i].getPixel_x());
             jointPoint[i].setPixel_y(handMark.jointPoint[i].getPixel_y());
         }
-        System.arraycopy(handMark.jointPoint,0,jointPoint,0,handMark.jointPoint.length);
         for(int i=1;i<22;i++){
             fingerBones[i]=new Vector3D(handMark.jointPoint[i].getLocation_x()-handMark.jointPoint[i-1].getLocation_x(),
                     handMark.jointPoint[i].getLocation_y()-handMark.jointPoint[i-1].getLocation_y(),
@@ -36,18 +31,11 @@ public class HandPosture {
             fingerLength[i]=fingerBones[i].lengthL2();
         }
         //key vectors for hand local axis
-        bone1to5=new Vector3D(handMark.jointPoint[5].getLocation_x()-handMark.jointPoint[1].getLocation_x(),
-                handMark.jointPoint[5].getLocation_y()-handMark.jointPoint[1].getLocation_y(),
-                handMark.jointPoint[5].getLocation_z()-handMark.jointPoint[1].getLocation_z());
-        bone5to9=new Vector3D(handMark.jointPoint[9].getLocation_x()-handMark.jointPoint[5].getLocation_x(),
-                handMark.jointPoint[9].getLocation_y()-handMark.jointPoint[5].getLocation_y(),
-                handMark.jointPoint[9].getLocation_z()-handMark.jointPoint[5].getLocation_z());
-        bone9to13=new Vector3D(handMark.jointPoint[13].getLocation_x()-handMark.jointPoint[9].getLocation_x(),
-                handMark.jointPoint[13].getLocation_y()-handMark.jointPoint[9].getLocation_y(),
-                handMark.jointPoint[13].getLocation_z()-handMark.jointPoint[9].getLocation_z());
-        bone13to17=new Vector3D(handMark.jointPoint[17].getLocation_x()-handMark.jointPoint[13].getLocation_x(),
-                handMark.jointPoint[17].getLocation_y()-handMark.jointPoint[13].getLocation_y(),
-                handMark.jointPoint[17].getLocation_z()-handMark.jointPoint[13].getLocation_z());
+        for(int i=0;i<4;i++){
+            specialBones[i]=new Vector3D(handMark.jointPoint[i*4+5].getLocation_x()-handMark.jointPoint[i*4+1].getLocation_x(),
+                    handMark.jointPoint[i*4+5].getLocation_y()-handMark.jointPoint[i*4+1].getLocation_y(),
+                    handMark.jointPoint[i*4+5].getLocation_z()-handMark.jointPoint[i*4+1].getLocation_z());
+        }
         bone5to13=Vector3D.plus(bone5to9,bone9to13);
         //the relation between vectors and local axis should be: x:bone5to13 y:fingerBones[9] z:x crossProd y;
         handX=new Vector3D(bone5to13.getX(),bone5to13.getY(),bone5to13.getZ());
@@ -63,7 +51,7 @@ public class HandPosture {
         }
 
     }
-    public void angleCalc(HandPosture standard) {
+    public void angleCalc(HandPosture3D standard) {
         //save calibrated length
         calibratedLength=standard.calibratedLength.clone();
 
@@ -94,7 +82,7 @@ public class HandPosture {
     }
 
     //special points needing deal
-    private int[] specialP={5,9,13,17};
+    private int[] specialP={1,5,9,13,17};
     //basic hand posture
     public Position[] jointPoint =new Position[21];
     public Vector3D[] fingerBones=new Vector3D[20];
@@ -113,6 +101,7 @@ public class HandPosture {
     public Vector3D bone9to13;
     public Vector3D bone5to13;
     public Vector3D bone13to17;
+    public Vector3D[] specialBones={bone1to5,bone5to9,bone9to13,bone13to17,bone5to13};
     public double handAlpha;
     public double handBeta;
     public double handGama;

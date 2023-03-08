@@ -21,6 +21,7 @@ public class HandMark {
     public boolean historyMoveSign =false;
     public boolean historyPushSign =false;
     public boolean historyFOnKSign =false;
+    Enums.tapSign opSign= Enums.tapSign.noSignal;
     public int historyKey =99999;
     public double gratitude2lastp=0.0;
     public double gratitude2last5p=0.0; //使用最小二乘法得到当前5帧的线性拟合后的梯度

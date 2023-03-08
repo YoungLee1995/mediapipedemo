@@ -1,4 +1,4 @@
-package com.example.testcalculator.keyboard.taprules;
+package com.example.testcalculator.keyboard.rules.taprules;
 
 import com.example.testcalculator.keyboard.datastruct.HandMarks;
 import com.example.testcalculator.keyboard.datastruct.KeyShape;

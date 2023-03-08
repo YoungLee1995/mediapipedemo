@@ -1,50 +1,69 @@
 package com.example.testcalculator.keyboard.datastruct;
 
-public class Position {
-    private double location_x;
-    private double location_y;
-    private double location_z;
+import com.example.testcalculator.keyboard.math.Vector3D;
 
-    private double pixel_x;
-    private double pixel_y;
+public class Position {
+    public Position() {
+    }
+    public Position(double location_x, double location_y, double location_z) {
+        location[0]=location_x;
+        location[1]=location_y;
+        location[2]=location_z;
+    }
+
+    public Position(double location_x, double location_y, double location_z, double pixel_x, double pixel_y) {
+        location[0]=location_x;
+        location[1]=location_y;
+        location[2]=location_z;
+        location[3]=pixel_x;
+        location[4]=pixel_y;
+    }
+    public Position(Vector3D finger) {
+        location[0]=finger.getX();
+        location[1]=finger.getY();
+        location[2]=finger.getZ();
+    }
+
+    public double[] location = new double[5];
+
 
     public double getLocation_x() {
-        return location_x;
+        return location[0];
     }
 
     public void setLocation_x(double location_x) {
-        this.location_x = location_x;
+        location[0]=location_x;
     }
 
     public double getLocation_y() {
-        return location_y;
+        return location[1];
     }
 
     public void setLocation_y(double location_y) {
-        this.location_y = location_y;
+        location[1] = location_y;
     }
 
     public double getLocation_z() {
-        return location_z;
+        return location[2];
     }
 
     public void setLocation_z(double location_z) {
-        this.location_z = location_z;
+        location[2] = location_z;
     }
 
     public double getPixel_x() {
-        return pixel_x;
+        return location[3];
     }
 
     public void setPixel_x(double pixel_x) {
-        this.pixel_x = pixel_x;
+        location[3] = pixel_x;
     }
 
     public double getPixel_y() {
-        return pixel_y;
+        return location[4];
     }
 
     public void setPixel_y(double pixel_y) {
-        this.pixel_y = pixel_y;
+        location[4] = pixel_y;
     }
 }
