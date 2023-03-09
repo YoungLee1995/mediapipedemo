@@ -6,72 +6,72 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ShortMove {
-    public static Double[][] wave0001={{0.0,0.55,0.0},{0.0,1.0,0.0}};
+    public static double[][] wave0001={{0.0,0.55,0.0},{0.0,1.0,0.0}};
     public static Integer[] id0001={3,4};
 
-    public static Double[][] wave0002={{0.0,0.25,0.55,0.0},{0.0,0.5,1.0,0.0}};
+    public static double[][] wave0002={{0.0,0.25,0.55,0.0},{0.0,0.5,1.0,0.0}};
     public static Integer[] id0002={3,4};
 
-    public static Double[][] wave0003={{0.0,0.55,0.25,0.0},{0.0,1.0,0.5,0.0}};
+    public static double[][] wave0003={{0.0,0.55,0.25,0.0},{0.0,1.0,0.5,0.0}};
     public static Integer[] id0003={3,4};
 
-    public static Double[][] wave0004={{0.0,0.25,0.55,0.25,0.0},{0.0,0.5,1.0,0.5,0.0}};
+    public static double[][] wave0004={{0.0,0.25,0.55,0.25,0.0},{0.0,0.5,1.0,0.5,0.0}};
     public static Integer[] id0004={3,4};
-    public static Double[][] wave0005={{0.0,0.4,0.0},{0.0,0.7,0.0},{0.0,1.0,0.0}};
+    public static double[][] wave0005={{0.0,0.4,0.0},{0.0,0.7,0.0},{0.0,1.0,0.0}};
     public static Integer[] id0005={6+21,7+21,8+21};
 
-    public static Double[][] wave0006={{0.0,0.2,0.4,0.0},{0.0,0.35,0.7,0.0},{0.0,0.5,1.0,0.0}};
+    public static double[][] wave0006={{0.0,0.2,0.4,0.0},{0.0,0.35,0.7,0.0},{0.0,0.5,1.0,0.0}};
     public static Integer[] id0006={6+21,7+21,8+21};
 
-    public static Double[][] wave0007={{0.0,0.4,0.2,0.0},{0.0,0.7,0.35,0.0},{0.0,1.0,0.5,0.0}};
+    public static double[][] wave0007={{0.0,0.4,0.2,0.0},{0.0,0.7,0.35,0.0},{0.0,1.0,0.5,0.0}};
     public static Integer[] id0007={6+21,7+21,8+21};
 
-    public static Double[][] wave0008={{0.0,0.2,0.4,0.2,0.0},{0.0,0.35,0.7,0.35,0.0},{0.0,0.5,1.0,0.5,0.0}};
+    public static double[][] wave0008={{0.0,0.2,0.4,0.2,0.0},{0.0,0.35,0.7,0.35,0.0},{0.0,0.5,1.0,0.5,0.0}};
     public static Integer[] id0008={7+21,8+21};
 
-    public static Double[][] wave0009= {
+    public static double[][] wave0009= {
             {0.0,0.4,0.0},{0.0,0.7,0.0},{0.0,1.0,0.0},
             {0.0,0.4,0.0},{0.0,0.7,0.0},{0.0,1.0,0.0},
     };
     public static Integer[] id0009={10+21,11+21,12+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0010={
+    public static double[][] wave0010={
             {0.0,0.2,0.4,0.0},{0.0,0.35,0.7,0.0},{0.0,0.5,1.0,0.0},
             {0.0,0.2,0.4,0.0},{0.0,0.35,0.7,0.0},{0.0,0.5,1.0,0.0},
     };
     public static Integer[] id0010={10+21,11+21,12+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0011={
+    public static double[][] wave0011={
             {0.0,0.4,0.2,0.0},{0.0,0.7,0.35,0.0},{0.0,1.0,0.5,0.0},
             {0.0,0.4,0.2,0.0},{0.0,0.7,0.35,0.0},{0.0,1.0,0.5,0.0},
     };
     public static Integer[] id0011={10+21,11+21,12+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0012={
+    public static double[][] wave0012={
             {0.0,0.2,0.4,0.2,0.0},{0.0,0.35,0.7,0.35,0.0},{0.0,0.5,1.0,0.5,0.0},
             {0.0,0.2,0.4,0.2,0.0},{0.0,0.35,0.7,0.35,0.0},{0.0,0.5,1.0,0.5,0.0},
     };
     public static Integer[] id0012={10+21,11+21,12+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0013= {
+    public static double[][] wave0013= {
             {0.0,0.4,0.0},{0.0,0.7,0.0},{0.0,1.0,0.0},
             {0.0,0.24,0.0},{0.0,0.42,0.0},{0.0,0.6,0.0},
     };
     public static Integer[] id0013={18+21,19+21,20+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0014={
+    public static double[][] wave0014={
             {0.0,0.2,0.4,0.0},{0.0,0.35,0.7,0.0},{0.0,0.5,1.0,0.0},
             {0.0,0.12,0.24,0.0},{0.0,0.21,0.42,0.0},{0.0,0.3,0.6,0.0},
     };
     public static Integer[] id0014={18+21,19+21,20+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0015={
+    public static double[][] wave0015={
             {0.0,0.4,0.2,0.0},{0.0,0.7,0.35,0.0},{0.0,1.0,0.5,0.0},
             {0.0,0.24,0.12,0.0},{0.0,0.42,0.21,0.0},{0.0,0.6,0.3,0.0},
     };
     public static Integer[] id0015={18+21,19+21,20+21,14+21,15+21,16+21};
 
-    public static Double[][] wave0016={
+    public static double[][] wave0016={
             {0.0,0.2,0.4,0.2,0.0},{0.0,0.35,0.7,0.35,0.0},{0.0,0.5,1.0,0.5,0.0},
             {0.0,0.12,0.24,0.12,0.0},{0.0,0.21,0.42,0.21,0.0},{0.0,0.3,0.6,0.3,0.0},
     };

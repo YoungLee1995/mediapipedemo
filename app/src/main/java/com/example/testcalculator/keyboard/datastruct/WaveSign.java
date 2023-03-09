@@ -5,20 +5,20 @@ import java.util.Arrays;
 
 public class WaveSign {
     public ArrayList<Integer> usedId=new ArrayList();
-    public ArrayList<Double[]> waves =new ArrayList<>();
+    public ArrayList<double[]> waves =new ArrayList<>();
 
     public WaveSign() {
     }
 
-    public WaveSign(ArrayList usedId, ArrayList<Double[]> stadWaves) {
+    public WaveSign(ArrayList usedId, ArrayList<double[]> stadWaves) {
         this.usedId = usedId;
         this.waves = stadWaves;
     }
-    public WaveSign(Integer[] usedId, Double[][] stadWaves) {
+    public WaveSign(Integer[] usedId, double[][] stadWaves) {
         for(int id:usedId){
             this.usedId.add(id);
         }
-        for (Double[] value:stadWaves){
+        for (double[] value:stadWaves){
             this.waves.add(Arrays.copyOf(value, value.length));
         }
     }

@@ -41,10 +41,19 @@ public class HandPosture2D {
         handY=new Vector3D(fingerBones[9].getX(),fingerBones[9].getY(),0.0);
         handX=handX.normalized();
         handY=handY.normalized();
+        //calc local bone vec
         for(int i=1;i<22;i++){
             fingerBonesLocal[i].setX(Vector3D.pointProd(handX,fingerBones[i]));
             fingerBonesLocal[i].setY(Vector3D.pointProd(handY,fingerBones[i]));
             fingerBonesLocal[i].setZ(0.0);
+        }
+        //calc local jointPoint
+        for (int i:specialP){
+            Vector3D finger=new Vector3D(0.0,0.0,0.0);
+            for (int j=0;j<4;j++){
+                finger=Vector3D.plus(finger,fingerBonesLocal[i]);
+                jointPointLocal[i]=new Position(finger);
+            }
         }
 
     }

@@ -26,7 +26,9 @@ public class Position {
 
     public double[] location = new double[5];
 
-
+    public double[] getLocation(){
+        return location;
+    }
     public double getLocation_x() {
         return location[0];
     }

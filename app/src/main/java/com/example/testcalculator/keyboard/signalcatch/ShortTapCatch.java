@@ -16,16 +16,24 @@ public class ShortTapCatch {
         double baseThresh=0.5;
         for (ArrayList<WaveSign> waves:tapSigns){
             for (WaveSign wave:waves){
+                int waveDuration=wave.waves.get(0).length;
+                //conv of real wave
+                double selfRealConv=Statistics.selfConv(handMarks,waveDuration);
+                //conv of pack wave
+                double selfPackConv=0.0;
+                double coConv=0.0;
                 int relatedPNum=wave.usedId.size();
-                for (int i=0;i<relatedPNum;i++){
-                    int picNum=wave.waves.get(i).length;
-                    int valueId=wave.usedId.get(i);
-                    Double[] realWave= Statistics.lastNZeroMean(handMarks,picNum,valueId);
-                    double correlation=Statistics.correlationCalc(realWave,wave.waves.get(i));
-                    if (correlation>baseThresh){
-                        baseThresh=correlation;
-                        result.setCode(signId);
+                for(double[] pointWave:wave.waves){
+                    for (int i=0;i<relatedPNum;i++){
+                        selfPackConv+=Statistics.aveCorrelation(pointWave,pointWave);
+                        double[] realWave=Statistics.lastNZeroMean(handMarks,waveDuration,wave.usedId.get(i));
+                        coConv+=Statistics.aveCorrelation(realWave,pointWave);
                     }
+                }
+                double correlation=coConv/Math.sqrt(selfPackConv*selfRealConv);
+                if (correlation>baseThresh){
+                    baseThresh=correlation;
+                    result.setCode(signId);
                 }
             }
             signId++;

@@ -5,9 +5,9 @@ import com.example.testcalculator.keyboard.datastruct.HandMarks;
 import java.util.ArrayList;
 
 public class Statistics {
-    public static Double[] zeroMean(Double[] A) {
+    public static double[] zeroMean(double[] A) {
         int sizeA = A.length;
-        Double[] B = new Double[sizeA];
+        double[] B = new double[sizeA];
         for (int i = 0; i < sizeA; i++) {
             B[i] = A[i];
         }
@@ -21,9 +21,26 @@ public class Statistics {
         }
         return B;
     }
+    //后续应该将每一帧自卷积存储在handmarks中减少计算量
+    public static double selfConv(HandMarks h, int n){
+        double result=0.0;
+        int size=h.graList.size();
+        for (int i=0;i<21;i++){
+            double[] waveX=new double[n];
+            double[] waveY=new double[n];
+            double[] waveZ=new double[n];
+            for (int time=size-n;time<size;time++){
+                waveX[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_x();
+                waveY[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_y();
+                waveZ[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_z();
+            }
+            result+=aveCorrelation(waveX,waveX)+aveCorrelation(waveY,waveY)+aveCorrelation(waveZ,waveZ);
+        }
+        return result;
+    }
 
-    public static Double[] lastNZeroMean(HandMarks handMarks, int n, int id) {
-        Double[] result = new Double[n];
+    public static double[] lastNZeroMean(HandMarks handMarks, int n, int id) {
+        double[] result = new double[n];
         int xyzId=0;
         int realId=id;
         while (realId>20){
@@ -34,7 +51,7 @@ public class Statistics {
         if (n > markSize) {
             throw new IllegalArgumentException("n is larger than the size of ArrayList A.");
         }
-        Double[] B = new Double[n];
+        double[] B = new double[n];
         for (int i = 0; i < n; i++) {
             B[i] = handMarks.markList.get(markSize - n + i).jointPoint[realId].location[xyzId];
         }
@@ -50,7 +67,7 @@ public class Statistics {
     }
 
 
-    public static double correlationCalc(Double[] A, Double[] B) {
+    public static double correlationCalc(double[] A, double[] B) {
         int n = A.length;
         double sumA = 0.0;
         double sumB = 0.0;
@@ -76,7 +93,7 @@ public class Statistics {
         }
     }
 
-    public static double aveCorrelation(Double[] A, Double[] B) {
+    public static double aveCorrelation(double[] A, double[] B) {
         // 计算平均值
         double sumA = 0.0;
         double sumB = 0.0;
@@ -88,8 +105,8 @@ public class Statistics {
         double meanB = sumB / B.length;
 
         // 将数组转换为零均值数组
-        Double[] zeroMeanA = new Double[A.length];
-        Double[] zeroMeanB = new Double[B.length];
+        double[] zeroMeanA = new double[A.length];
+        double[] zeroMeanB = new double[B.length];
         for (int i = 0; i < A.length; i++) {
             zeroMeanA[i] = A[i] - meanA;
             zeroMeanB[i] = B[i] - meanB;
