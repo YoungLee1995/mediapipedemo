@@ -1,6 +1,9 @@
 package com.example.testcalculator.keyboard.datastruct;
 
+import android.util.Log;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TestKeyBoard {
@@ -43,6 +46,27 @@ public class TestKeyBoard {
                 testKeyMap.put(id, k);
                 id++;
             }
+        }
+    }
+
+    public void Init(double width, double height, List<Integer> list){
+        //x轴起始高度为屏幕三分之一处
+        double y = height/3;
+        double keySize = (width-20)/list.get(0)-10;
+        double z=300.0;
+        double x = 0.0;
+        int id = 0;
+        testKeyMap = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            x = (width-(keySize+10)*list.get(i))/2;
+            for (int j = 0; j < list.get(i); j++) {
+                Keyboard k = new Keyboard(x, y,z, keySize, keySize, z);
+                k.setId(id);
+                testKeyMap.put(id,k);
+                id++;
+                x = x+keySize+10;
+            }
+            y = y+keySize+10;
         }
     }
 }

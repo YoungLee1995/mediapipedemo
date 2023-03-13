@@ -78,11 +78,11 @@ class MainActivity : AppCompatActivity() {
     private var heightSize = 0f
     private var screenSize: ScreenPixelSize? = null
     private val textList = mutableListOf(
-        "7", "8", "9", "+",
-        "4", "5", "6", "-",
-        "1", "2", "3", "*",
-        "清除", "0", "=", "/"
+        "Q", "W", "E", "R","T", "Y", "U", "I","O", "P",
+        "A", "S","D", "F", "G", "H","J", "K", "L",
+        "Z", "X", "C", "V", "B", "N", "M","。"
     )
+    private val list = mutableListOf<Int>(10,9,8)
     private var index = -1L
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         keyContent.setLength(0)
         keyboard = TestKeyBoard()
         screenSize?.let {
-            keyboard.Init(it.screenWidth.toDouble(), it.screenHeight.toDouble())
+            keyboard.Init(it.screenWidth.toDouble(), it.screenHeight.toDouble(),list)
         }
 
         //动态绘制键盘View
