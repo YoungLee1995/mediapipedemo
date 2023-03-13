@@ -15,14 +15,14 @@ public class ShortTapCatch {
     public static Enums.tapSign shortTapCatch(HandMarks handMarks){
         //Enums.tapSign result= Enums.tapSign.noSignal;
         int signId=1;
-        double baseThresh=0.5;
+        double baseThresh=0.4;
         int result=0;
         for (ArrayList<WaveSign> waves:tapSigns){
             for (WaveSign wave:waves){
                 int waveDuration=wave.waves.get(0).length;
                 //conv of real wave
                 double selfRealConv=Statistics.selfConv(handMarks,waveDuration);
-                if(selfRealConv<100.0){
+                if(selfRealConv<50.0){
                     selfRealConv = 5000.0;
                 }
                 //conv of pack wave
@@ -38,13 +38,11 @@ public class ShortTapCatch {
                 }
                 double correlation=coConv/Math.sqrt(selfPackConv*selfRealConv);
                 if (correlation>baseThresh){
+                    Log.v("ShortTapCatch","自卷积："+selfRealConv+" 库卷积："+selfPackConv+" 协方差："+coConv+" 相关性："+correlation);
                     baseThresh=correlation;
                     result = signId;
-                    Log.v("signId",signId+"");
                     //result.setCode(signId);
                 }
-
-                Log.v("MainActivity",selfRealConv+":"+selfPackConv+":"+coConv+":"+correlation);
             }
             signId++;
         }

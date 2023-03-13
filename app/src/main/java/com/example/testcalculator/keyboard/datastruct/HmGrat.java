@@ -10,6 +10,8 @@ public class HmGrat extends HandMark{
             this.jointPoint[i].setLocation_x(h2.jointPoint[i].getLocation_x()-h1.jointPoint[i].getLocation_x());
             this.jointPoint[i].setLocation_y(h2.jointPoint[i].getLocation_y()-h1.jointPoint[i].getLocation_y());
             this.jointPoint[i].setLocation_z(h2.jointPoint[i].getLocation_z()-h1.jointPoint[i].getLocation_z());
+            this.jointPoint[i].setPixel_x(h2.jointPoint[i].getPixel_x()-h1.jointPoint[i].getPixel_x());
+            this.jointPoint[i].setPixel_y(h2.jointPoint[i].getPixel_y()-h1.jointPoint[i].getPixel_y());
         }
     }
 }

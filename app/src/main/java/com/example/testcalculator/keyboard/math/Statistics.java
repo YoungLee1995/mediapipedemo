@@ -30,8 +30,8 @@ public class Statistics {
             double[] waveY=new double[n];
             double[] waveZ=new double[n];
             for (int time=size-n;time<size;time++){
-                waveX[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_x();
-                waveY[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_y();
+                waveX[n+time-size]=h.graList.get(time).jointPoint[i].getPixel_x();
+                waveY[n+time-size]=h.graList.get(time).jointPoint[i].getPixel_y();
                 waveZ[n+time-size]=0;//h.graList.get(time).jointPoint[i].getLocation_z();
             }
             Log.v("Statostics",waveX[0]+":"+waveY[0]+":"+waveZ[0]);
@@ -48,13 +48,13 @@ public class Statistics {
             xyzId++;
             realId-=21;
         }
-        int markSize = handMarks.markList.size();
-        if (n > markSize) {
+        int graSize = handMarks.graList.size();
+        if (n > graSize) {
             throw new IllegalArgumentException("n is larger than the size of ArrayList A.");
         }
         double[] B = new double[n];
         for (int i = 0; i < n; i++) {
-            B[i] = handMarks.markList.get(markSize - n + i).jointPoint[realId].location[xyzId];
+            B[i] = handMarks.graList.get(graSize - n + i).jointPoint[realId].location[xyzId];
         }
         double sum = 0;
         for (double b : B) {

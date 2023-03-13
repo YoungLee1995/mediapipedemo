@@ -34,6 +34,7 @@ import com.example.testcalculator.utils.log.LogcatUtils
 import com.example.testcalculator.utils.ResUIUtils
 import com.example.testcalculator.utils.log.L
 import com.example.testcalculator.weight.HandGestureView
+import com.google.gson.Gson
 import com.google.mediapipe.framework.TextureFrame
 import com.google.mediapipe.solutioncore.SolutionGlSurfaceView
 import com.google.mediapipe.solutions.hands.HandLandmark
@@ -88,6 +89,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         screenSize = ResUIUtils.getScreenPixelSize(this)
+
+        Log.v("111111111多少","${Gson().toJson(screenSize)}")
         index = -1L
         initView()
         ///启动功能
@@ -119,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         keyContent.setLength(0)
         keyboard = TestKeyBoard()
         screenSize?.let {
+            Log.v("1111111112222多少","${Gson().toJson(it)}")
             keyboard.Init(it.screenWidth.toDouble(), it.screenHeight.toDouble(),list)
         }
 
@@ -355,6 +359,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private var startTime=0L
     val handMarks = HandMarks()
     val optimizedMarks =
         OptimizedMarks()
@@ -446,8 +451,7 @@ class MainActivity : AppCompatActivity() {
 
         //L.v("長度---${landmark.size}----${normalizedLandmark.size}")
         //坐标转换成handMark
-        val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
-        L.v("当前z-${hand.z}")
+        //val hand= landmark[HandLandmark.INDEX_FINGER_TIP]
         val handMark =
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
                 System.currentTimeMillis())
@@ -456,28 +460,41 @@ class MainActivity : AppCompatActivity() {
             //计算各信号值，存储前120帧数据
             val position = handMark.jointPoint[8]
             val intKeyId = FingerDetect.onWhichKey(keyboard, position)
-            val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
+            //val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             handMark.ID=intKeyId;
-            handMark.historyFOnKSign=isFingerOnKey;
+            //handMark.historyFOnKSign=isFingerOnKey;
             optimizedMarks.pushback(handMark)
         } else {
             //满足120帧  先删除第一针
             val position = optimizedMarks.originMarks.markList.last.jointPoint[8]
             val intKeyId = FingerDetect.onWhichKey(keyboard, position)
-            val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
+            //val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             optimizedMarks.popfront()
             handMark.ID=intKeyId
-            handMark.historyFOnKSign=isFingerOnKey
+            //handMark.historyFOnKSign=isFingerOnKey
             optimizedMarks.pushback(handMark)
 
-            Log.v("jointPoint","開始")
-            optimizedMarks.originMarks.graList.last.jointPoint.forEach {
-                Log.v("jointPoint","${it.location_x}===${it.location_y}")
-            }
+            startTime = System.currentTimeMillis()
             val tapSign = ShortTapCatch.shortTapCatch(optimizedMarks.originMarks)
+            Log.v("时间间隔","${System.currentTimeMillis()-startTime}")
             if(tapSign!=Enums.tapSign.noSignal){
                 Log.v("点击操作","$tapSign")
+                var fingerId = 4
+                when(tapSign){
+                    Enums.tapSign.f1Tap->fingerId = 4
+                    Enums.tapSign.f2Tap->fingerId = 8
+                    Enums.tapSign.f3Tap->fingerId = 12
+                    Enums.tapSign.f5Tap->fingerId = 20
+                    else -> {}
+                }
+
+                val pushedKey = FingerDetect.pushedKey(keyboard,optimizedMarks.originMarks,fingerId,8)
+
+                if(pushedKey[1]>4){
+                    Log.v("点击操作当前按下数据", textList[pushedKey[0]])
+                }
             }
+
             /*
             GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.originMarks)

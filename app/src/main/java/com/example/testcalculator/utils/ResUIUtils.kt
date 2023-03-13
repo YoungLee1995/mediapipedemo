@@ -16,12 +16,14 @@ import android.text.TextUtils
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import com.example.testcalculator.bean.ScreenPixelSize
 import java.io.ByteArrayOutputStream
+
 
 object ResUIUtils {
 
@@ -332,12 +334,18 @@ object ResUIUtils {
     }
 
     fun getScreenPixelSize(activity: Activity):ScreenPixelSize{
-        val windowManager: WindowManager = activity.windowManager
+        /*val windowManager: WindowManager = activity.windowManager
         val point = Point()
         windowManager.defaultDisplay.getRealSize(point)
         //屏幕实际宽度（像素个数）
         //屏幕实际高度（像素个数）
-        return ScreenPixelSize( point.x, point.y)
+        return ScreenPixelSize( point.x, point.y)*/
+
+        val displayMetrics = DisplayMetrics()
+        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val width = displayMetrics.widthPixels
+        val height = displayMetrics.heightPixels
+        return ScreenPixelSize(width, height)
     }
 
 

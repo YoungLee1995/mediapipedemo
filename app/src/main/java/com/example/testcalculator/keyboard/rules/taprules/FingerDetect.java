@@ -1,11 +1,14 @@
 package com.example.testcalculator.keyboard.rules.taprules;
 
+import android.util.Log;
+
 import com.example.testcalculator.keyboard.datastruct.HandMarks;
 import com.example.testcalculator.keyboard.datastruct.KeyShape;
 import com.example.testcalculator.keyboard.datastruct.Position;
 import com.example.testcalculator.keyboard.datastruct.TestKeyBoard;
 import com.example.testcalculator.keyboard.headers.Enums;
 import com.example.testcalculator.keyboard.math.Distance;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,10 +31,12 @@ public class FingerDetect {
             newKeyCenter.setPixel_y(y + height / 2.0);
             double d = Distance.pixelDistance(finger1_position, newKeyCenter);
             int nearId = Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getId();
-            if (d < distance && isFingerOnKey(testKeyBoard, finger1_position, nearId)) {
-                id = nearId;
-                //Log.v("距离id",d+":"+newKeyCenter.getPixel_x());
-                distance = d;
+            if(nearId<27){
+                if (d < distance && isFingerOnKey(testKeyBoard, finger1_position, nearId)) {
+                    id = nearId;
+                    //Log.v("距离id",d+":"+newKeyCenter.getPixel_x());
+                    distance = d;
+                }
             }
         }
 
