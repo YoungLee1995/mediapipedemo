@@ -26,7 +26,6 @@ import com.example.testcalculator.keyboard.datastruct.HandMarks
 import com.example.testcalculator.keyboard.datastruct.OptimizedMarks
 import com.example.testcalculator.keyboard.datastruct.TestKeyBoard
 import com.example.testcalculator.keyboard.headers.Enums
-import com.example.testcalculator.keyboard.math.GratitudeCalc
 import com.example.testcalculator.keyboard.rules.taprules.FingerDetect
 import com.example.testcalculator.keyboard.signalcatch.ShortTapCatch
 import com.example.testcalculator.utils.CameraInputTest
@@ -456,7 +455,7 @@ class MainActivity : AppCompatActivity() {
         if (optimizedMarks.originMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
             val position = handMark.jointPoint[8]
-            val intKeyId = FingerDetect.pushedKey(keyboard, position)
+            val intKeyId = FingerDetect.onWhichKey(keyboard, position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             handMark.ID=intKeyId;
             handMark.historyFOnKSign=isFingerOnKey;
@@ -464,7 +463,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             //满足120帧  先删除第一针
             val position = optimizedMarks.originMarks.markList.last.jointPoint[8]
-            val intKeyId = FingerDetect.pushedKey(keyboard, position)
+            val intKeyId = FingerDetect.onWhichKey(keyboard, position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             optimizedMarks.popfront()
             handMark.ID=intKeyId
