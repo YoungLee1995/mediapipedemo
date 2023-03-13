@@ -11,9 +11,6 @@ public class HandMarks {
     public int ID;
 
     public void pushback(HandMark h) {
-        this.markList.add(h);
-        HandPosture2D hp = new HandPosture2D(h);
-        this.postureList.add(hp);
         if(this.markList.size()<1){
             HmGrat hg=new HmGrat();
             this.graList.add(hg);
@@ -21,6 +18,9 @@ public class HandMarks {
             HmGrat hg=new HmGrat(this.markList.getLast(),h);
             this.graList.add(hg);
         }
+        this.markList.add(h);
+        HandPosture2D hp = new HandPosture2D(h);
+        this.postureList.add(hp);
     }
 
     public void poplast() {

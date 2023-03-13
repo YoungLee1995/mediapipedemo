@@ -28,6 +28,7 @@ import com.example.testcalculator.keyboard.datastruct.TestKeyBoard
 import com.example.testcalculator.keyboard.headers.Enums
 import com.example.testcalculator.keyboard.math.GratitudeCalc
 import com.example.testcalculator.keyboard.rules.taprules.FingerDetect
+import com.example.testcalculator.keyboard.signalcatch.ShortTapCatch
 import com.example.testcalculator.utils.CameraInputTest
 import com.example.testcalculator.utils.DecimalUtil
 import com.example.testcalculator.utils.log.LogcatUtils
@@ -450,7 +451,7 @@ class MainActivity : AppCompatActivity() {
         L.v("当前z-${hand.z}")
         val handMark =
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
-            System.currentTimeMillis())
+                System.currentTimeMillis())
         //判断是否满足120帧
         if (optimizedMarks.originMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
@@ -466,50 +467,25 @@ class MainActivity : AppCompatActivity() {
             val intKeyId = FingerDetect.pushedKey(keyboard, position)
             val isFingerOnKey = FingerDetect.isFingerOnKey(keyboard, position, intKeyId)
             optimizedMarks.popfront()
-            handMark.ID=intKeyId;
-            handMark.historyFOnKSign=isFingerOnKey;
+            handMark.ID=intKeyId
+            handMark.historyFOnKSign=isFingerOnKey
             optimizedMarks.pushback(handMark)
+
+            Log.v("jointPoint","開始")
+            optimizedMarks.originMarks.graList.last.jointPoint.forEach {
+                Log.v("jointPoint","${it.location_x}===${it.location_y}")
+            }
+            val tapSign = ShortTapCatch.shortTapCatch(optimizedMarks.originMarks)
+            if(tapSign!=Enums.tapSign.noSignal){
+                Log.v("点击操作","$tapSign")
+            }
+            /*
             GratitudeCalc.gratitudeTagCalc(optimizedMarks.originMarks,8);
             val isKeyPushed = FingerDetect.isKeyPushed(optimizedMarks.originMarks)
             if (isKeyPushed&&optimizedMarks.originMarks.outputPermitTag) {
                 optimizedMarks.originMarks.outputPermitTag=false;
                 if (intKeyId < textList.size) {
                     setIntKeyHandle(intKeyId)
-                    /*if (intKeyId == 9) {
-                        //清空操作
-                        keyContent.setLength(0)
-                    } else if (intKeyId == 11) {
-                        //退格操作
-                        if (keyContent.isNotEmpty()) {
-                            if (keyContent.length == 1) {
-                                //不包含
-                                keyContent.deleteCharAt(keyContent.length - 1)
-                            } else {
-                                //包含
-                                keyContent.deleteCharAt(keyContent.length - 2)
-                                keyContent.deleteCharAt(keyContent.length - 1)
-                            }
-                        }
-                    } else {
-                        if (keyContent.isEmpty()) {
-                            keyContent.append(textList[intKeyId])
-                        } else {
-                            keyContent.append(",${textList[intKeyId]}")
-                        }
-                    }
-
-                    binding.keyboardContent.post {
-                        keyBoardViewMap[intKeyId]?.let { keyView ->
-                            setTextViewAnimation(keyView)
-                        }
-                        binding.keyboardContent.text = keyContent.toString()
-                        *//*if(intKeyId==9){
-                            //清空操作
-                            //把当前选中的View重置回去
-                            recoverySelectView()
-                            selectView = null
-                        }*//*
-                    }*/
                 }
             }
             else
@@ -523,7 +499,7 @@ class MainActivity : AppCompatActivity() {
                     optimizedMarks.originMarks.outputPermitTag=true
                     optimizedMarks.originMarks.lastOutputFrame=0
                 }
-            }
+            }*/
         }
     }
 

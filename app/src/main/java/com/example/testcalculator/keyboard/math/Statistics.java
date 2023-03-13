@@ -1,8 +1,8 @@
 package com.example.testcalculator.keyboard.math;
 
-import com.example.testcalculator.keyboard.datastruct.HandMarks;
+import android.util.Log;
 
-import java.util.ArrayList;
+import com.example.testcalculator.keyboard.datastruct.HandMarks;
 
 public class Statistics {
     public static double[] zeroMean(double[] A) {
@@ -32,9 +32,10 @@ public class Statistics {
             for (int time=size-n;time<size;time++){
                 waveX[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_x();
                 waveY[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_y();
-                waveZ[n+time-size]=h.graList.get(time).jointPoint[i].getLocation_z();
+                waveZ[n+time-size]=0;//h.graList.get(time).jointPoint[i].getLocation_z();
             }
-            result+=aveCorrelation(waveX,waveX)+aveCorrelation(waveY,waveY)+aveCorrelation(waveZ,waveZ);
+            Log.v("Statostics",waveX[0]+":"+waveY[0]+":"+waveZ[0]);
+            result+= aveConv(waveX,waveX)+ aveConv(waveY,waveY);//+aveCorrelation(waveZ,waveZ);
         }
         return result;
     }
@@ -93,7 +94,7 @@ public class Statistics {
         }
     }
 
-    public static double aveCorrelation(double[] A, double[] B) {
+    public static double aveConv(double[] A, double[] B) {
         // 计算平均值
         double sumA = 0.0;
         double sumB = 0.0;
@@ -118,11 +119,11 @@ public class Statistics {
         double denominator2 = 0.0;
         for (int i = 0; i < A.length; i++) {
             numerator += zeroMeanA[i] * zeroMeanB[i];
-            denominator1 += Math.pow(zeroMeanA[i], 2);
-            denominator2 += Math.pow(zeroMeanB[i], 2);
+//            denominator1 += Math.pow(zeroMeanA[i], 2);
+//            denominator2 += Math.pow(zeroMeanB[i], 2);
         }
-        double correlation = numerator / (Math.sqrt(denominator1) * Math.sqrt(denominator2));
+//        double correlation = numerator / (Math.sqrt(denominator1) * Math.sqrt(denominator2));
 
-        return correlation;
+        return numerator;
     }
 }
