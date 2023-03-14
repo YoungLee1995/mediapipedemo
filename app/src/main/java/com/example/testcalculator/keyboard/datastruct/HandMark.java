@@ -20,6 +20,7 @@ public class HandMark {
     public long timestamp=0;
     public boolean historyMoveSign =false;
     public boolean historyPushSign =false;
+    public Enums.tapSign historySign=Enums.tapSign.noSignal;
     public boolean historyFOnKSign =false;
     Enums.tapSign opSign= Enums.tapSign.noSignal;
     public int historyKey =99999;
