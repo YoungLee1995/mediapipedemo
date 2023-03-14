@@ -84,14 +84,15 @@ class MainActivity : AppCompatActivity() {
     )
     private val list = mutableListOf<Int>(10,9,8)
     private var index = -1L
+
+    private val keyBuffer = StringBuffer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         screenSize = ResUIUtils.getScreenPixelSize(this)
-
-        Log.v("111111111多少","${Gson().toJson(screenSize)}")
         index = -1L
+        keyBuffer.setLength(0)
         initView()
         ///启动功能
         initData()
@@ -122,7 +123,6 @@ class MainActivity : AppCompatActivity() {
         keyContent.setLength(0)
         keyboard = TestKeyBoard()
         screenSize?.let {
-            Log.v("1111111112222多少","${Gson().toJson(it)}")
             keyboard.Init(it.screenWidth.toDouble(), it.screenHeight.toDouble(),list)
         }
 
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             textView.setTextColor(ContextCompat.getColor(this, R.color.white))
             textView.setBackgroundResource(R.drawable.keyboard_btn_bg)
 
-            if (key == 3) {
+            if (key == 0) {
                 //第三个元素  也就是第一排的最后一个
                 binding.tvCalculation.viewTreeObserver.addOnGlobalLayoutListener(object :
                     OnGlobalLayoutListener {
@@ -155,19 +155,17 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             binding.tvCalculation.viewTreeObserver.removeGlobalOnLayoutListener(this)
                         }
-                        val marginTop =
-                            keyboard.position.pixel_y.toFloat()
                         val params = FrameLayout.LayoutParams(
                             LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT
                         )
                         val screenWidth = screenSize?.screenWidth?:0
-                        val width = screenWidth-(keyboard.position.pixel_x.toInt()+keyboard.keyShape.key_width.toInt())
-                        //params.height = marginTop
-                        params.width =width
+                        params.height = keyboard.position.pixel_y.toInt()
+                        params.width =screenWidth
                         binding.tvCalculation.layoutParams = params
-                        binding.tvCalculation.x = (keyboard.position.pixel_x+keyboard.keyShape.key_width).toFloat()
-                        binding.tvCalculation.y = marginTop
+                        binding.tvCalculation.x =keyboard.position.pixel_x.toFloat()
+                        binding.tvCalculation.y =0f
+                        binding.tvCalculation.setTextColor(ContextCompat.getColor(this@MainActivity,R.color.red))
                         //ResUIUtils.setMargins(binding.tvCalculation, 0, marginTop, 0, 0)
                     }
                 })
@@ -225,6 +223,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 pixelWidth = binding.keyboardLayout.width
                 pixelHeight = binding.keyboardLayout.height
+                Log.v("多少222","$pixelWidth==$pixelHeight")
             }
         })
         binding.flHandSpot.removeAllViewsInLayout()
@@ -419,6 +418,7 @@ class MainActivity : AppCompatActivity() {
             if (binding.flHandSpot.visibility == View.GONE) {
                 binding.flHandSpot.visibility = View.VISIBLE
             }
+            //3.13更新的系統版本，不需要在旋轉宽高
             if (widthSize == 0f) {
                 val frameSize = cameraInput.cameraHelper.frameSize
                 if(frameSize.width<frameSize.height||!cameraInput.isCameraRotated){
@@ -428,13 +428,13 @@ class MainActivity : AppCompatActivity() {
                     heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
                 }else{
                     widthSize = (pixelHeight*(pixelHeight.toDouble()/pixelWidth.toDouble())).toFloat()
-/*=======
-                    widthSize = (pixelHeight * (frameSize.width / frameSize.height)).toFloat()
+
+                    /*widthSize = (pixelHeight * (frameSize.width / frameSize.height)).toFloat()
                     //3:4  得到图像原始高度
                     //heightSize = (widthSize*frameSize.height.toDouble()/frameSize.width.toDouble()).toFloat()
                 } else {
                     widthSize = (pixelHeight * (frameSize.height / frameSize.width)).toFloat()
->>>>>>> 7a08b6b (完善单指计算器算法点击功能)*/
+*/
                     //4:3  得到图像原始高度
                     heightSize = (widthSize*frameSize.width.toDouble()/frameSize.height.toDouble()).toFloat()
                 }
@@ -492,6 +492,15 @@ class MainActivity : AppCompatActivity() {
 
                 if(pushedKey[1]>4){
                     Log.v("点击操作当前按下数据", textList[pushedKey[0]])
+                    binding.tvCalculation.post {
+                        val text = textList[pushedKey[0]]
+                        if(keyBuffer.isEmpty()){
+                            keyBuffer.append(text)
+                        }else{
+                            keyBuffer.append(",$text")
+                        }
+                        binding.tvCalculation.text = keyBuffer
+                    }
                 }
             }
 

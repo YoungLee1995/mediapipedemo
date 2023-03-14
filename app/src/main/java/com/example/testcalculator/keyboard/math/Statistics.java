@@ -42,7 +42,7 @@ public class Statistics {
 
     public static double[] lastNZeroMean(HandMarks handMarks, int n, int id) {
         double[] result = new double[n];
-        int xyzId=0;
+        int xyzId=3;
         int realId=id;
         while (realId>20){
             xyzId++;
