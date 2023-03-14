@@ -30,9 +30,8 @@ import com.example.testcalculator.keyboard.rules.taprules.FingerDetect
 import com.example.testcalculator.keyboard.signalcatch.ShortTapCatch
 import com.example.testcalculator.utils.CameraInputTest
 import com.example.testcalculator.utils.DecimalUtil
-import com.example.testcalculator.utils.log.LogcatUtils
 import com.example.testcalculator.utils.ResUIUtils
-import com.example.testcalculator.utils.log.L
+import com.example.testcalculator.utils.log.LogcatUtils
 import com.example.testcalculator.weight.HandGestureView
 import com.google.gson.Gson
 import com.google.mediapipe.framework.TextureFrame
@@ -455,6 +454,10 @@ class MainActivity : AppCompatActivity() {
         val handMark =
             HandMark.lm2hm(widthSize.toInt(), pixelWidth, pixelHeight, landmark, normalizedLandmark,
                 System.currentTimeMillis())
+        Log.v(
+            "handmark",
+            "pixelx：${handMark.jointPoint[8].pixel_x} pixely：${handMark.jointPoint[8].pixel_y}"
+        )
         //判断是否满足120帧
         if (optimizedMarks.originMarks.markList.size < 120) {
             //计算各信号值，存储前120帧数据
