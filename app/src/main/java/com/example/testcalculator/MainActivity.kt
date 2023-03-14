@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
-            if (textList[key] == "清除") {
+            /*if (textList[key] == "清除") {
                 textView.setOnClickListener {
                     keyContent.setLength(0)
                     //setTextViewAnimation(textView)
@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity() {
                     setTextViewAnimation(textView)
                     binding.keyboardContent.text = keyContent.toString()
                 }
-            }
+            }*/
             binding.keyboardLayout.addView(textView)
             //把按钮的View对象存储起来
             keyBoardViewMap[key] = textView
@@ -496,12 +496,17 @@ class MainActivity : AppCompatActivity() {
                     Log.v("点击操作当前按下数据", textList[pushedKey[0]])
                     binding.tvCalculation.post {
                         val text = textList[pushedKey[0]]
-                        if(keyContent.isEmpty()){
-                            keyContent.append(text)
+                        if(text!="清除"){
+                            if(keyContent.isEmpty()){
+                                keyContent.append(text)
+                            }else{
+                                keyContent.append(",$text")
+                            }
+                            binding.tvCalculation.text = keyContent
                         }else{
-                            keyContent.append(",$text")
+                            keyContent.setLength(0)
+                            binding.tvCalculation.text = keyContent.toString()
                         }
-                        binding.tvCalculation.text = keyContent
                     }
                 }
             }
