@@ -79,19 +79,18 @@ class MainActivity : AppCompatActivity() {
     private val textList = mutableListOf(
         "Q", "W", "E", "R","T", "Y", "U", "I","O", "P",
         "A", "S","D", "F", "G", "H","J", "K", "L",
-        "Z", "X", "C", "V", "B", "N", "M","。"
+        "Z", "X", "C", "V", "B", "N", "M","清除"
     )
     private val list = mutableListOf<Int>(10,9,8)
     private var index = -1L
 
-    private val keyBuffer = StringBuffer()
+    //private val keyBuffer = StringBuffer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         screenSize = ResUIUtils.getScreenPixelSize(this)
         index = -1L
-        keyBuffer.setLength(0)
         initView()
         ///启动功能
         initData()
@@ -172,8 +171,8 @@ class MainActivity : AppCompatActivity() {
             if (textList[key] == "清除") {
                 textView.setOnClickListener {
                     keyContent.setLength(0)
-                    setTextViewAnimation(textView)
-                    binding.keyboardContent.text = keyContent.toString()
+                    //setTextViewAnimation(textView)
+                    binding.tvCalculation.text = keyContent.toString()
                 }
             } else if (textList[key] == "退格") {
                 textView.setOnClickListener {
@@ -497,12 +496,12 @@ class MainActivity : AppCompatActivity() {
                     Log.v("点击操作当前按下数据", textList[pushedKey[0]])
                     binding.tvCalculation.post {
                         val text = textList[pushedKey[0]]
-                        if(keyBuffer.isEmpty()){
-                            keyBuffer.append(text)
+                        if(keyContent.isEmpty()){
+                            keyContent.append(text)
                         }else{
-                            keyBuffer.append(",$text")
+                            keyContent.append(",$text")
                         }
-                        binding.tvCalculation.text = keyBuffer
+                        binding.tvCalculation.text = keyContent
                     }
                 }
             }
