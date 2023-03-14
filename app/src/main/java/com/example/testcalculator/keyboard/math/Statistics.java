@@ -32,9 +32,8 @@ public class Statistics {
             for (int time=size-n;time<size;time++){
                 waveX[n+time-size]=h.markList.get(time).jointPoint[i].getPixel_x();
                 waveY[n+time-size]=h.markList.get(time).jointPoint[i].getPixel_y();
-                waveZ[n+time-size]=0;//h.markList.get(time).jointPoint[i].getLocation_z();
+                waveZ[n+time-size]=0.1;//h.markList.get(time).jointPoint[i].getLocation_z();
             }
-            Log.v("Statostics",waveX[0]+":"+waveY[0]+":"+waveZ[0]);
             result+= aveConv(waveX,waveX)+ aveConv(waveY,waveY);//+aveCorrelation(waveZ,waveZ);
         }
         return result;
