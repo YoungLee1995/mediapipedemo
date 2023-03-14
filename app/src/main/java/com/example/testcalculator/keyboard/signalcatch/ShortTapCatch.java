@@ -21,7 +21,9 @@ public class ShortTapCatch {
         }
         //Enums.tapSign result= Enums.tapSign.noSignal;
         int signId=1;
-        double baseThresh=0.2;
+
+        double baseThresh=0.1;
+
         int result=0;
         for (ArrayList<WaveSign> waves:tapSigns){
             for (WaveSign wave:waves){
