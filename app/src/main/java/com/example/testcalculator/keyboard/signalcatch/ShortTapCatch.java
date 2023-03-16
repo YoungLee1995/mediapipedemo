@@ -22,7 +22,7 @@ public class ShortTapCatch {
         //Enums.tapSign result= Enums.tapSign.noSignal;
         int signId=1;
 
-        double baseThresh=0.1;
+        double baseThresh=0.25;
 
         int result=0;
         for (ArrayList<WaveSign> waves:tapSigns){
@@ -30,7 +30,7 @@ public class ShortTapCatch {
                 int waveDuration=wave.waves.get(0).length;
                 //conv of real wave
                 double selfRealConv=Statistics.selfConv(handMarks,waveDuration);
-                if(selfRealConv<5000.0){
+                if(selfRealConv<500.0){
                     selfRealConv = 50000000000.0;
 
                 }
