@@ -22,8 +22,8 @@ class TestApp : MultiDexApplication() {
         LogcatUtils.newInstance().init(this)
 
         //获取客户端
-//        val service = NxrVstJni.getNativeService()
-//        NxrVstJni.stopVst(service)
-//        NxrVstJni.stopStreaming(service)
+        /*val service = NxrVstJni.getNativeService()
+        NxrVstJni.stopVst(service)
+        NxrVstJni.stopStreaming(service)*/
     }
 }

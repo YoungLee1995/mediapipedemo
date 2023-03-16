@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.Typeface
+import android.hardware.display.DisplayManager
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
@@ -17,7 +18,6 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -335,17 +335,16 @@ object ResUIUtils {
     }
 
     fun getScreenPixelSize(activity: Activity):ScreenPixelSize{
-        /*val windowManager: WindowManager = activity.windowManager
-        val point = Point()
-        windowManager.defaultDisplay.getRealSize(point)
-        //屏幕实际宽度（像素个数）
-        //屏幕实际高度（像素个数）
-        return ScreenPixelSize( point.x, point.y)*/
-
-        val displayMetrics = DisplayMetrics()
-        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val width = displayMetrics.widthPixels
-        val height = displayMetrics.heightPixels
+        var appMetrics = DisplayMetrics()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val displayManager: DisplayManager =
+                activity.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            displayManager.getDisplay(activity.display!!.displayId).getRealMetrics(appMetrics)
+        } else {
+            appMetrics = activity.resources.displayMetrics
+        }
+        val width = appMetrics.widthPixels
+        val height = appMetrics.heightPixels
         return ScreenPixelSize(width, height)
     }
 

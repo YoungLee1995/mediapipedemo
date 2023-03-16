@@ -19,7 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.testcalculator.bean.ScreenPixelSize
+import com.example.testcalculator.bean.*
 import com.example.testcalculator.databinding.ActivityMainBinding
 import com.example.testcalculator.keyboard.datastruct.HandMark
 import com.example.testcalculator.keyboard.datastruct.HandMarks
@@ -31,6 +31,7 @@ import com.example.testcalculator.keyboard.signalcatch.ShortTapCatch
 import com.example.testcalculator.utils.CameraInputTest
 import com.example.testcalculator.utils.DecimalUtil
 import com.example.testcalculator.utils.ResUIUtils
+import com.example.testcalculator.utils.log.L
 import com.example.testcalculator.utils.log.LogcatUtils
 import com.example.testcalculator.weight.HandGestureView
 import com.google.gson.Gson
@@ -96,6 +97,19 @@ class MainActivity : AppCompatActivity() {
         initData()
         //setupLiveDemoUiComponents()
         //find_camera_resolution()
+
+        val bean = SignData()
+        for (i in 0..199){
+            val signBean = SignBean()
+            signBean.id = i
+            for (j in 0..2){
+                signBean.ids.add(j)
+                signBean.moves.add(WaveBean())
+            }
+            bean.signs.add(signBean)
+        }
+        L.v(Gson().toJson(bean))
+
     }
 
     private fun initView() {
@@ -121,6 +135,9 @@ class MainActivity : AppCompatActivity() {
         keyContent.setLength(0)
         keyboard = TestKeyBoard()
         screenSize?.let {
+            pixelWidth = it.screenWidth
+            pixelHeight = it.screenHeight
+            Log.v("多少222","$pixelWidth==$pixelHeight")
             keyboard.Init(it.screenWidth.toDouble(), it.screenHeight.toDouble(),list)
         }
 
@@ -211,7 +228,7 @@ class MainActivity : AppCompatActivity() {
             Log.v("多少111","$pixelWidth==$pixelHeight")
         }*/
 
-        binding.keyboardLayout.viewTreeObserver.addOnGlobalLayoutListener(object :
+        /*binding.keyboardLayout.viewTreeObserver.addOnGlobalLayoutListener(object :
             OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (Build.VERSION.SDK_INT >= 16) {
@@ -223,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                 pixelHeight = binding.keyboardLayout.height
                 Log.v("多少222","$pixelWidth==$pixelHeight")
             }
-        })
+        })*/
         binding.flHandSpot.removeAllViewsInLayout()
         handsView.clear()
         for (i in 0..20) {
@@ -356,7 +373,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private var startTime=0L
+    //private var startTime=0L
     val handMarks = HandMarks()
     val optimizedMarks =
         OptimizedMarks()
@@ -476,9 +493,7 @@ class MainActivity : AppCompatActivity() {
             //handMark.historyFOnKSign=isFingerOnKey
             optimizedMarks.pushback(handMark)
 
-            startTime = System.currentTimeMillis()
             val tapSign = ShortTapCatch.shortTapCatch(optimizedMarks.originMarks)
-            Log.v("时间间隔","${System.currentTimeMillis()-startTime}")
             if(tapSign!=Enums.tapSign.noSignal){
                 Log.v("点击操作","$tapSign")
                 var fingerId = 4
