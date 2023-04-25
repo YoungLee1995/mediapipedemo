@@ -1,5 +1,7 @@
 package com.example.testcalculator.keyboard.datastruct;
 
+import static com.example.testcalculator.keyboard.method2Outside.FingerDetect.onWhichKey;
+
 import java.util.LinkedList;
 
 public class HandMarks {

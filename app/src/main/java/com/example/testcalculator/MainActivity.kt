@@ -26,7 +26,7 @@ import com.example.testcalculator.keyboard.datastruct.HandMarks
 import com.example.testcalculator.keyboard.datastruct.OptimizedMarks
 import com.example.testcalculator.keyboard.datastruct.TestKeyBoard
 import com.example.testcalculator.keyboard.headers.Enums
-import com.example.testcalculator.keyboard.rules.taprules.FingerDetect
+import com.example.testcalculator.keyboard.method2Outside.FingerDetect
 import com.example.testcalculator.keyboard.signalcatch.ShortTapCatch
 import com.example.testcalculator.utils.CameraInputTest
 import com.example.testcalculator.utils.DecimalUtil

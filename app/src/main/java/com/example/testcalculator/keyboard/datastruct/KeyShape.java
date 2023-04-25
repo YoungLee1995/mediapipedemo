@@ -2,7 +2,7 @@ package com.example.testcalculator.keyboard.datastruct;
 
 public class KeyShape {
     KeyShape(){}
-    KeyShape(double x,double y,double z){
+    public KeyShape(double x, double y, double z){
         key_width=x;
         key_height=y;
         key_depth=z;

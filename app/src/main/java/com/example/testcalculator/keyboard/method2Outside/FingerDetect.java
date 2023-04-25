@@ -1,4 +1,4 @@
-package com.example.testcalculator.keyboard.rules.taprules;
+package com.example.testcalculator.keyboard.method2Outside;
 
 import android.util.Log;
 
@@ -32,7 +32,42 @@ public class FingerDetect {
             double d = Distance.pixelDistance(finger1_position, newKeyCenter);
             int nearId = Objects.requireNonNull(testKeyBoard.testKeyMap.get(i)).getId();
             if(nearId<27){
-                if (d < distance && isFingerOnKey(testKeyBoard, finger1_position, nearId)) {
+                if (d < distance && isFingerOnKey(finger1_position, keyCenter, keyShape)) {
+                    id = nearId;
+                    //Log.v("距离id",d+":"+newKeyCenter.getPixel_x());
+                    distance = d;
+                }
+            }
+        }
+
+        return id;
+    }
+
+    public static int onWhichKey(ArrayList<float[]> testKeyBoard, Position finger1_position) {
+        double distance = Double.MAX_VALUE;
+        int id = 99999;
+        Position newKeyCenter = new Position();
+        for (int i = 0; i < testKeyBoard.size(); i++) {
+            double keyX = (testKeyBoard.get(i)[0]+testKeyBoard.get(i)[2]+
+                    testKeyBoard.get(i)[4]+testKeyBoard.get(i)[6])/4.0;
+            double keyY = (testKeyBoard.get(i)[1]+testKeyBoard.get(i)[3]+
+                    testKeyBoard.get(i)[5]+testKeyBoard.get(i)[7])/4.0;
+            double keyWidth=(-testKeyBoard.get(i)[0]+testKeyBoard.get(i)[2]-
+                    testKeyBoard.get(i)[4]+testKeyBoard.get(i)[6])/2.0;
+            double keyHeight = (-testKeyBoard.get(i)[1]+testKeyBoard.get(i)[3]-
+                    testKeyBoard.get(i)[5]+testKeyBoard.get(i)[7])/4.0;
+            Position keyCenter = new Position(keyX,keyY,0.0);
+            KeyShape keyShape = new KeyShape(keyWidth,keyHeight,0.0);
+            double x = keyCenter.getPixel_x();
+            double y = keyCenter.getPixel_y();
+            double width = keyShape.getKey_width();
+            double height = keyShape.getKey_height();
+            newKeyCenter.setPixel_x(x + width / 2.0);
+            newKeyCenter.setPixel_y(y + height / 2.0);
+            double d = Distance.pixelDistance(finger1_position, newKeyCenter);
+            int nearId = i;
+            if(nearId<27){
+                if (d < distance && isFingerOnKey(finger1_position, keyCenter, keyShape)) {
                     id = nearId;
                     //Log.v("距离id",d+":"+newKeyCenter.getPixel_x());
                     distance = d;
@@ -47,6 +82,18 @@ public class FingerDetect {
         //此处确定是否落入键盘的标准
         Position keyCenter = Objects.requireNonNull(testKeyBoard.testKeyMap.get(id)).getPosition();
         KeyShape keyShape = Objects.requireNonNull(testKeyBoard.testKeyMap.get(id)).getKeyShape();
+        double x = keyCenter.getPixel_x();
+        double y = keyCenter.getPixel_y();
+        double width = keyShape.getKey_width();
+        double height = keyShape.getKey_height();
+        double pixelX = x + width / 2.0;
+        double pixelY = y + height / 2.0;
+        return (finger1_position.getPixel_x() - pixelX) < keyShape.getKey_width() / 2.0 &&
+                (finger1_position.getPixel_y() - pixelY) < keyShape.getKey_height() / 2.0;
+    }
+
+    public static boolean isFingerOnKey(Position finger1_position, Position keyCenter, KeyShape keyShape ) {
+        //此处确定是否落入键盘的标准
         double x = keyCenter.getPixel_x();
         double y = keyCenter.getPixel_y();
         double width = keyShape.getKey_width();
@@ -77,8 +124,45 @@ public class FingerDetect {
         ArrayList<Integer> onKeyList=new ArrayList<>();
 
         int size=handMarks.markList.size();
+        handMarks.markList.getLast().keyId=onWhichKey(testKeyBoard,handMarks.markList.getLast().jointPoint[fingerId]);
         for (int i=0;i<picNum;i++){
-            int id=onWhichKey(testKeyBoard,handMarks.markList.get(size-picNum+i).jointPoint[fingerId]);
+            int id=handMarks.markList.get(size-picNum+i).keyId;
+            onKeyList.add(id);
+        }
+        for (int i = 0; i < onKeyList.size(); i++) {
+            int num = onKeyList.get(i);
+            if(num<100){
+                if (map.containsKey(num)) {
+                    map.put(num, map.get(num) + 1);
+                } else {
+                    map.put(num, 1);
+                }
+            }
+        }
+
+        int maxNum = 0;
+        int maxCount = 0;
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int num = entry.getKey();
+            int count = entry.getValue();
+            if (count > maxCount) {
+                maxNum = num;
+                maxCount = count;
+            }
+        }
+
+        return new int[]{maxNum, maxCount};
+    }
+
+    public static int[] pushedKey(ArrayList<float[]> testKeyBoard, HandMarks handMarks, int fingerId, int picNum) {
+        Map<Integer, Integer> map = new HashMap<>();
+        ArrayList<Integer> onKeyList=new ArrayList<>();
+
+        int size=handMarks.markList.size();
+        handMarks.markList.getLast().keyId=onWhichKey(testKeyBoard,handMarks.markList.getLast().jointPoint[fingerId]);
+        for (int i=0;i<picNum;i++){
+            int id=handMarks.markList.get(size-picNum+i).keyId;
             onKeyList.add(id);
         }
         for (int i = 0; i < onKeyList.size(); i++) {

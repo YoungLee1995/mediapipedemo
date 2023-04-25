@@ -27,6 +27,7 @@ public class HandMark {
     public double gratitude2lastp=0.0;
     public double gratitude2last5p=0.0; //使用最小二乘法得到当前5帧的线性拟合后的梯度
     public Enums.GratitudeTag gratitudeTag= Enums.GratitudeTag.FLAT;
+    public Integer keyId=null;
 
     //将landmark转换为handmark
     public static HandMark lm2hm(int width,int pixelWidth,
